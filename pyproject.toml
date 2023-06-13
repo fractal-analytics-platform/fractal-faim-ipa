@@ -9,6 +9,9 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 source = "vcs"
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 # https://peps.python.org/pep-0621/
 [project]
 name = "fractal-faim-hcs"
@@ -31,15 +34,11 @@ classifiers = [
     # "Typing :: Typed",
 ]
 
-[tool.hatch.metadata]
-allow-direct-references = true
-
-# add your package dependencies here
 dependencies = [
-    "fractal-tasks-core==0.10.0a1",
+    "fractal-tasks-core==0.10.0a2",
     "pydantic",
     "zarr",
-    "faim-hcs@git+https://github.com/jluethi/faim-hcs/tree/fractal-roi-tables",
+    "faim-hcs @ git+https://github.com/jluethi/faim-hcs.git@fractal-roi-tables",
 ]
 
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
