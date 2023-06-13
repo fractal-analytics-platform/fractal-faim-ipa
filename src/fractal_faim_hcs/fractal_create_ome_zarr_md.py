@@ -3,14 +3,16 @@ import logging
 import shutil
 from collections.abc import Sequence
 from os.path import exists, join
-from typing import Any, Optional
+from typing import Any
 
 from faim_hcs.io.MolecularDevicesImageXpress import parse_files
 from faim_hcs.Zarr import build_zarr_scaffold
+from pydantic.decorator import validate_arguments
 
 logger = logging.getLogger(__name__)
 
 
+@validate_arguments
 def create_ome_zarr_md(
     *,
     input_paths: Sequence[str],
@@ -95,23 +97,8 @@ def create_ome_zarr_md(
 
 if __name__ == "__main__":
     from fractal_tasks_core._utils import run_fractal_task
-    from pydantic import BaseModel, Extra
-
-    class TaskArguments(BaseModel, extra=Extra.forbid):
-        """TMP docstring."""
-
-        input_paths: Sequence[str]
-        output_path: str
-        metadata: dict[str, Any]
-        zarr_name: Optional[str]
-        mode: Optional[str]
-        order_name: Optional[str]
-        barcode: Optional[str]
-        overwrite: Optional[bool]
-        num_levels: Optional[int]
 
     run_fractal_task(
         task_function=create_ome_zarr_md,
-        TaskArgsModel=TaskArguments,
         logger_name=logger.name,
     )

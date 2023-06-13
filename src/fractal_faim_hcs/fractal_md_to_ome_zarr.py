@@ -16,10 +16,12 @@ from faim_hcs.Zarr import (
     write_czyx_image_to_well,
     write_roi_table,
 )
+from pydantic.decorator import validate_arguments
 
 logger = logging.getLogger(__name__)
 
 
+@validate_arguments
 def md_to_ome_zarr(
     *,
     input_paths: Sequence[str],
@@ -63,6 +65,17 @@ def md_to_ome_zarr(
         projection_files = well_files[well_files["z"].isnull()]
         stack_files = well_files[~well_files["z"].isnull()]
 
+        if len(stack_files) == 0:
+            raise ValueError(
+                f"Could not find any 3D stack files for well {well} in "
+                f"{images_path}, but {mode=} was selected."
+            )
+        if len(projection_files) == 0:
+            raise ValueError(
+                f"Could not find any 2D files for well {well} in "
+                f"{images_path}, but {mode=} was selected."
+            )
+
         (
             projection,
             proj_hists,
@@ -96,6 +109,10 @@ def md_to_ome_zarr(
         )
         write_cyx_image_to_well(img, hists, ch_metadata, metadata, field)
     else:
+        # TODO: This part is failing. Debug why. And why not in tests.
+        # Problem: stack_files is empty. Why??
+        print(stack_files)
+        print(channels)
         (
             stack,
             stack_hist,
@@ -120,18 +137,8 @@ def md_to_ome_zarr(
 
 if __name__ == "__main__":
     from fractal_tasks_core._utils import run_fractal_task
-    from pydantic import BaseModel, Extra
-
-    class TaskArguments(BaseModel, extra=Extra.forbid):
-        """TMP docstring."""
-
-        input_paths: Sequence[str]
-        output_path: str
-        component: str
-        metadata: dict[str, Any]
 
     run_fractal_task(
         task_function=md_to_ome_zarr,
-        TaskArgsModel=TaskArguments,
         logger_name=logger.name,
     )
