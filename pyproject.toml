@@ -30,8 +30,17 @@ classifiers = [
     # "License :: OSI Approved :: BSD License",
     # "Typing :: Typed",
 ]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
 # add your package dependencies here
-dependencies = []
+dependencies = [
+    "fractal-tasks-core==0.10.0a1",
+    "pydantic",
+    "zarr",
+    "faim-hcs@git+https://github.com/jluethi/faim-hcs/tree/fractal-roi-tables",
+]
 
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
 # "extras" (e.g. for `pip install .[test]`)
