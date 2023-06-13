@@ -7,3 +7,5 @@
 [![codecov](https://codecov.io/gh/fractal-analytics-platform/fractal-faim-hcs/branch/main/graph/badge.svg)](https://codecov.io/gh/fractal-analytics-platform/fractal-faim-hcs)
 
 Provides Fractal tasks for the MD to OME-Zarr conversion of faim-hcs
+
+Example data is from https://github.com/fmi-faim/faim-hcs, just in this repo to allow easier automated testing.
