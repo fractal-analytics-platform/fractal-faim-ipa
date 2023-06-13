@@ -1,11 +1,11 @@
 # Fractal example scripts
 
-from faim_hcs.fractal.fractal_create_ome_zarr_md import create_ome_zarr_md
-from faim_hcs.fractal.fractal_md_to_ome_zarr import md_to_ome_zarr
+from fractal_faim_hcs.fractal_create_ome_zarr_md import create_ome_zarr_md
+from fractal_faim_hcs.fractal_md_to_ome_zarr import md_to_ome_zarr
 
-input_paths = ["../../resources/Projection-Mix"]
-input_paths = ["/Users/joel/Desktop/230219MK004EB-R1Bleach"]
-output_path = "../zarr-files"
+input_paths = ["../resources/Projection-Mix"]
+# input_paths = ["/Users/joel/Desktop/230219MK004EB-R1Bleach"]
+output_path = "zarr-files"
 
 order_name = "example-order"
 barcode = "example-barcode"
