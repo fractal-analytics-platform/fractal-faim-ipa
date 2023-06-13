@@ -109,10 +109,6 @@ def md_to_ome_zarr(
         )
         write_cyx_image_to_well(img, hists, ch_metadata, metadata, field)
     else:
-        # TODO: This part is failing. Debug why. And why not in tests.
-        # Problem: stack_files is empty. Why??
-        print(stack_files)
-        print(channels)
         (
             stack,
             stack_hist,

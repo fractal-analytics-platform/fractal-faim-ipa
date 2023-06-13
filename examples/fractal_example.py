@@ -1,7 +1,7 @@
 # Fractal example scripts
 
-from fractal_faim_hcs.fractal_create_ome_zarr_md import create_ome_zarr_md
-from fractal_faim_hcs.fractal_md_to_ome_zarr import md_to_ome_zarr
+from fractal_faim_hcs.create_ome_zarr_md import create_ome_zarr_md
+from fractal_faim_hcs.md_to_ome_zarr import md_to_ome_zarr
 
 input_paths = ["../resources/Projection-Mix"]
 # input_paths = ["/Users/joel/Desktop/230219MK004EB-R1Bleach"]

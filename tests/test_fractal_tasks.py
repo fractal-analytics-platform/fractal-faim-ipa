@@ -6,8 +6,8 @@ from pathlib import Path
 
 import anndata as ad
 import pytest
-from fractal_faim_hcs.fractal_create_ome_zarr_md import create_ome_zarr_md
-from fractal_faim_hcs.fractal_md_to_ome_zarr import md_to_ome_zarr
+from fractal_faim_hcs.create_ome_zarr_md import create_ome_zarr_md
+from fractal_faim_hcs.md_to_ome_zarr import md_to_ome_zarr
 
 
 def test_ome_zarr_conversion_mode_all_fractal_tasks():
