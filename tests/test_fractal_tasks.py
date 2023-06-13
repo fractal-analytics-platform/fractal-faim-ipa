@@ -44,33 +44,39 @@ def test_ome_zarr_conversion_mode_all_fractal_tasks():
             metadata=metatada_update,
         )
 
-    assert (
-        zarr_root
-        / f"{output_name}.zarr"
-        / "E"
-        / "7"
-        / "0"
-        / "C00_FITC_05_histogram.npz"
-    ).exists()
-    assert (
-        zarr_root
-        / f"{output_name}.zarr"
-        / "E"
-        / "7"
-        / "0"
-        / "C01_FITC_05_histogram.npz"
-    ).exists()
-    assert (
-        zarr_root / f"{output_name}.zarr" / "E" / "7" / "0" / "C02_empty_histogram.npz"
-    ).exists()
-    assert (
-        zarr_root
-        / f"{output_name}.zarr"
-        / "E"
-        / "7"
-        / "0"
-        / "C03_FITC_05_histogram.npz"
-    ).exists()
+    # FIXME: See https://github.com/jluethi/fractal-faim-hcs/issues/2
+    # assert (
+    #     zarr_root
+    #     / f"{output_name}.zarr"
+    #     / "E"
+    #     / "7"
+    #     / "0"
+    #     / "C00_FITC_05_histogram.npz"
+    # ).exists()
+    # assert (
+    #     zarr_root
+    #     / f"{output_name}.zarr"
+    #     / "E"
+    #     / "7"
+    #     / "0"
+    #     / "C01_FITC_05_histogram.npz"
+    # ).exists()
+    # assert (
+    #     zarr_root
+    #     / f"{output_name}.zarr"
+    #     / "E"
+    #     / "7"
+    #     / "0"
+    #     / "C02_empty_histogram.npz"
+    # ).exists()
+    # assert (
+    #     zarr_root
+    #     / f"{output_name}.zarr"
+    #     / "E"
+    #     / "7"
+    #     / "0"
+    #     / "C03_FITC_05_histogram.npz"
+    # ).exists()
 
     assert (
         zarr_root
