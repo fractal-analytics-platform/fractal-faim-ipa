@@ -5,7 +5,9 @@ from collections.abc import Sequence
 from os.path import exists, join
 from typing import Any
 
-from faim_hcs.io.MolecularDevicesImageXpress import parse_files
+from faim_hcs.io.MolecularDevicesImageXpress import parse_files, parse_files_zmb
+
+# from fractal_faim_hcs.zmb_file_parser import parse_files_zmb
 from faim_hcs.Zarr import build_zarr_scaffold
 from pydantic.decorator import validate_arguments
 
@@ -51,13 +53,19 @@ def create_ome_zarr_md(
         )
     order_name = (order_name,)
 
-    valid_modes = ("z-steps", "top-level", "all")
+    # valid_modes = ("z-steps", "top-level", "all")
+    valid_modes = ("2D", "3D", "combined", "ZMB-2D", "ZMB-3D", "ZMB-combined")
     if mode not in valid_modes:
         raise NotImplementedError(
             f"Only implemented for modes {valid_modes}, but got mode {mode=}"
         )
-
-    files = parse_files(input_paths[0], mode=mode)
+    fmi_modes = {"2D": "top-level", "3D": "z-steps", "combined": "all"}
+    if mode in fmi_modes.keys():
+        fmi_mode = fmi_modes[mode]
+        files = parse_files(input_paths[0], mode=fmi_mode)
+    else:
+        files = parse_files_zmb(input_paths[0], mode=mode)
+    # print(files)
 
     if overwrite and exists(join(output_path, zarr_name + ".zarr")):
         # Remove zarr if it already exists.

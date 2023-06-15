@@ -5,7 +5,9 @@ from pathlib import Path
 from typing import Any
 
 import zarr
-from faim_hcs.io.MolecularDevicesImageXpress import parse_files
+from faim_hcs.io.MolecularDevicesImageXpress import parse_files, parse_files_zmb
+
+# from fractal_faim_hcs.zmb_file_parser import parse_files_zmb
 from faim_hcs.MetaSeriesUtils import (
     get_well_image_CYX,
     get_well_image_CZYX,
@@ -45,6 +47,8 @@ def md_to_ome_zarr(
     images_path = metadata["original_paths"][0]
 
     valid_modes = ("z-steps", "top-level", "all")
+    valid_modes = ("2D", "3D", "combined", "ZMB-2D", "ZMB-3D", "ZMB-combined")
+    fmi_modes = {"2D": "top-level", "3D": "z-steps", "combined": "all"}
     if mode not in valid_modes:
         raise NotImplementedError(
             f"Only implemented for modes {valid_modes}, but got mode {mode=}"
@@ -55,13 +59,17 @@ def md_to_ome_zarr(
     # Can probably build this from input_path + component?
     plate = zarr.open(Path(output_path) / component.split("/")[0], mode="r+")
 
-    files = parse_files(images_path, mode=mode)
+    if mode in fmi_modes.keys():
+        fmi_mode = fmi_modes[mode]
+        files = parse_files(images_path, mode=fmi_mode)
+    else:
+        files = parse_files_zmb(images_path, mode=mode)
     well_files = files[files["well"] == well]
 
     # Get the zeroth field of the well.
     field: zarr.Group = plate[well[0]][str(int(well[1:]))][0]
 
-    if mode == "all":
+    if mode == "combined" or mode == "ZMB-combined":
         projection_files = well_files[well_files["z"].isnull()]
         stack_files = well_files[~well_files["z"].isnull()]
 
@@ -101,7 +109,7 @@ def md_to_ome_zarr(
     else:
         stack_files = well_files
 
-    if mode == "top-level":
+    if mode == "2D" or mode == "ZMB-2D":
         img, hists, ch_metadata, metadata, roi_tables = get_well_image_CYX(
             well_files=stack_files,
             channels=channels,
