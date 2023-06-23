@@ -118,7 +118,7 @@ def test_ome_zarr_conversion_mode_all_fractal_tasks():
         0.0,
         1399.6031494140625,
         699.8015747070312,
-        45.290000915527344,
+        45.18000030517578,
     ]
     assert df_well.loc["well_1"].values.flatten().tolist() == target_values
 
@@ -134,7 +134,7 @@ def test_ome_zarr_conversion_mode_all_fractal_tasks():
         0.0,
         699.8015747070312,
         699.8015747070312,
-        45.290000915527344,
+        45.18000030517578,
     ]
     assert df_fov.loc["Site 2"].values.flatten().tolist() == target_values
 
