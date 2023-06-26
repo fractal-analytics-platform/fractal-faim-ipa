@@ -10,10 +10,12 @@ Provides Fractal tasks for the MD to OME-Zarr conversion of faim-hcs
 
 Example data is from https://github.com/fmi-faim/faim-hcs, just in this repo to allow easier automated testing.
 
-While the package is not on pypi yet, you can install it locally (with the fractal tasks) in this way:
+While the package is not on pypi yet, you can install it locally in this way:
 
 ```
-pip install ".[fractal-tasks]"
+git clone https://github.com/jluethi/fractal-faim-hcs
+cd fractal-faim-hcs
+pip install -e .
 ```
 
 ### Adding tasks to Fractal server
