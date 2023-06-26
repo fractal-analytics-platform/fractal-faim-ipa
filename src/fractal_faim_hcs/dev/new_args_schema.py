@@ -19,7 +19,7 @@ import json
 from pathlib import Path
 
 import fractal_faim_hcs
-from fractal_faim_hcs.dev.lib_args_schemas import (
+from fractal_tasks_core.dev.lib_args_schemas import (
     create_schema_for_single_task,
 )
 
@@ -39,7 +39,9 @@ if __name__ == "__main__":
         executable = task["executable"]
         print(f"[{executable}] Start")
         try:
-            schema = create_schema_for_single_task(executable)
+            schema = create_schema_for_single_task(
+                executable, package="fractal_faim_hcs"
+            )
         except AttributeError as e:
             print(f"[{executable}] Skip, due to AttributeError")
             print(e)
