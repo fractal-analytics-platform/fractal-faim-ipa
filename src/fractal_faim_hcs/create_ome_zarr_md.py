@@ -88,7 +88,7 @@ def create_ome_zarr_md(
         "image": image_paths,
         "num_levels": num_levels,
         "coarsening_xy": 2,
-        "channels": files["channel"].unique().tolist(),
+        "channels": sorted(files["channel"].unique().tolist()),
         "mode": mode,
         "original_paths": input_paths[:],
     }
