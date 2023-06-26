@@ -34,7 +34,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "fractal-tasks-core==0.10.0a7",
+    "fractal-tasks-core==0.10.0",
     "pydantic",
     "zarr",
     "faim-hcs @ git+https://github.com/jluethi/faim-hcs.git@fractal-roi-tables",
