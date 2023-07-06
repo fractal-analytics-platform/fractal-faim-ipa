@@ -22,7 +22,6 @@ def create_ome_zarr_md(
     metadata: dict[str, Any],
     zarr_name: str = "Plate",
     mode: str = "all",
-    zmb_mode: bool = True,
     order_name: str = "example-order",
     barcode: str = "example-barcode",
     overwrite: bool = True,
@@ -35,9 +34,9 @@ def create_ome_zarr_md(
     :param output_path: Path to the output file (Fractal managed)
     :param metadata: Metadata dictionary (Fractal managed)
     :param zarr_name: Name of the zarr plate file that will be created
-    :param mode: Mode can be 3 values: "z-steps" (only parse the 3D data),
-                 "top-level" (only parse the 2D data), "all" (parse both)
-    :param zmb_mode: Use alternative parsing mode for ZMB files
+    :param mode: Mode can be 4 values: "z-steps" (only parse the 3D data),
+                 "top-level" (only parse the 2D data), "all" (parse both),
+                 "zmb" (zmb-parser, detect mode automatically)
     :param order_name: Name of the order
     :param barcode: Barcode of the plate
     :param overwrite: Whether to overwrite the zarr file if it already exists
@@ -55,14 +54,14 @@ def create_ome_zarr_md(
         )
     order_name = (order_name,)
 
-    valid_modes = ("z-steps", "top-level", "all")
+    valid_modes = ("z-steps", "top-level", "all", "zmb")
     if mode not in valid_modes:
         raise NotImplementedError(
             f"Only implemented for modes {valid_modes}, but got mode {mode=}"
         )
 
-    if zmb_mode:
-        files = parse_files_zmb(input_paths[0], mode=mode)
+    if mode=='zmb':
+        files, _ = parse_files_zmb(input_paths[0])
     else:
         files = parse_files(input_paths[0], mode=mode)
 
@@ -97,7 +96,6 @@ def create_ome_zarr_md(
         "coarsening_xy": 2,
         "channels": sorted(files["channel"].unique().tolist()),
         "mode": mode,
-        "zmb_mode": zmb_mode,
         "original_paths": input_paths[:],
     }
     return metadata_update

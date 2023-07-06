@@ -4,7 +4,7 @@ import pandas as pd
 from faim_hcs.io.MolecularDevicesImageXpress import _list_dataset_files
 
 
-def parse_files_zmb(path, mode="all"):
+def parse_files_zmb(path):
     """Parse files from a Molecular Devices ImageXpress dataset for ZMB setup."""
     _METASERIES_FILENAME_PATTERN_ZMB_2D = (
         r"(?P<name>.*)_(?P<well>[A-Z]+"
@@ -25,10 +25,22 @@ def parse_files_zmb(path, mode="all"):
         )
     )
 
+    files = files.query("field == 's1'")
+    print(files)
+
+    # mode detection
+    if files['z'].isnull().all():
+        mode = 'top-level'
+    elif '0' in list(files['z']):
+        mode = 'all'
+        files.loc[files['z']=='0', 'z'] = None
+    else:
+        mode = 'z-steps'
+
     # Ensure that field and channel are not None
     if files["field"].isnull().all():
         files["field"] = files["field"].fillna("s1")
     if files["channel"].isnull().all():
         files["channel"] = files["channel"].fillna("w1")
 
-    return files
+    return files, mode

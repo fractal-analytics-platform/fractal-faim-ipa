@@ -26,11 +26,21 @@ overwrite = True
 #     "/Users/joel/Dropbox/Joel/BioVisionCenter/Fractal/Example_data/" \
 #     "ZMB_MD_data/50um_Zstack"
 # ]
+# top-level:
+# input_paths = [
+#     "/home/flurin/Documents/ZMB/fractal1.3/demo_data/data_for_joel/plate1_Plate_1734"
+# ]
+# z-steps:
+# input_paths = [
+#     "/home/flurin/Documents/ZMB/fractal1.3/demo_data/40x-1time-26z-2well-6site-4channel_Plate_1795_partial"
+# ]
+# all:
 input_paths = [
-    "/Users/joel/Dropbox/Joel/BioVisionCenter/Fractal/Example_data/"
-    "ZMB_MD_data/plate1_Plate_1734"
+    "/home/flurin/Documents/ZMB/fractal1.3/demo_data/lysosomes-actin-cellsignlamp1_Plate_1762_partial_with_0"
 ]
-mode = "top-level"
+
+mode = "zmb"
+grid_montage = False
 output_name = "Test_ZMB_3D_new"
 
 metatada_update = create_ome_zarr_md(
@@ -50,4 +60,5 @@ for component in metatada_update["image"]:
         output_path=output_path,
         component=component,
         metadata=metatada_update,
+        grid_montage=grid_montage
     )
