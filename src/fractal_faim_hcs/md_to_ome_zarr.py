@@ -62,7 +62,6 @@ def md_to_ome_zarr(
     else:
         files = parse_files(images_path, mode=mode)
 
-    print(files)
     well_files = files[files["well"] == well]
 
     # Get the zeroth field of the well.
