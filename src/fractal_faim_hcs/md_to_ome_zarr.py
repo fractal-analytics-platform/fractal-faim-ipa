@@ -18,6 +18,8 @@ from faim_hcs.Zarr import (
 )
 from pydantic.decorator import validate_arguments
 
+from fractal_faim_hcs.parse_zmb import parse_files_zmb
+
 logger = logging.getLogger(__name__)
 
 
@@ -55,7 +57,12 @@ def md_to_ome_zarr(
     # Can probably build this from input_path + component?
     plate = zarr.open(Path(output_path) / component.split("/")[0], mode="r+")
 
-    files = parse_files(images_path, mode=mode)
+    if metadata["zmb_mode"]:
+        files = parse_files_zmb(images_path, mode=mode)
+    else:
+        files = parse_files(images_path, mode=mode)
+
+    print(files)
     well_files = files[files["well"] == well]
 
     # Get the zeroth field of the well.
