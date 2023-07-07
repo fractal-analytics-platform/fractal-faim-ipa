@@ -48,6 +48,7 @@ def md_to_ome_zarr(
     well = component.split("/")[1] + component.split("/")[2].zfill(2)
     mode = metadata["mode"]
     images_path = metadata["original_paths"][0]
+    query = metadata["query"]
 
     if grid_montage:
         montage_fn = montage_grid_image_YX
@@ -66,8 +67,12 @@ def md_to_ome_zarr(
     plate = zarr.open(Path(output_path) / component.split("/")[0], mode="r+")
 
     if mode=='zmb':
-        files, mode = parse_files_zmb(images_path)
+        files, mode = parse_files_zmb(images_path, query)
     else:
+        if not query=="":
+            raise NotImplementedError(
+                "Filtering is only implemented in zmb mode"
+            )
         files = parse_files(images_path, mode=mode)
 
     well_files = files[files["well"] == well]

@@ -28,18 +28,23 @@ overwrite = True
 # ]
 # top-level:
 # input_paths = [
-#     "/home/flurin/Documents/ZMB/fractal1.3/demo_data/data_for_joel/plate1_Plate_1734"
+#     "/home/flurin/Documents/ZMB/fractal/demo_data/data_for_joel/plate1_Plate_1734"
 # ]
 # z-steps:
 # input_paths = [
-#     "/home/flurin/Documents/ZMB/fractal1.3/demo_data/40x-1time-26z-2well-6site-4channel_Plate_1795_partial"
+#     "/home/flurin/Documents/ZMB/fractal/demo_data/40x-1time-26z-2well-6site-4channel_Plate_1795_partial"
 # ]
 # all:
 input_paths = [
-    "/home/flurin/Documents/ZMB/fractal1.3/demo_data/lysosomes-actin-cellsignlamp1_Plate_1762_partial_with_0"
+    "/home/flurin/Documents/ZMB/fractal/demo_data/lysosomes-actin-cellsignlamp1_Plate_1762"
 ]
+# all, faim:
+# input_paths = [
+#     "/home/flurin/Documents/ZMB/fractal/faim-hcs/resources/Projection-Mix"
+# ]
 
 mode = "zmb"
+query = "well=='D05' and field==['s1','s2','s3']"
 grid_montage = False
 output_name = "Test_ZMB_3D_new"
 
@@ -49,6 +54,7 @@ metatada_update = create_ome_zarr_md(
     metadata={},
     zarr_name=output_name,
     mode=mode,
+    query=query,
     order_name=order_name,
     barcode=barcode,
     overwrite=overwrite,

@@ -4,7 +4,7 @@ import pandas as pd
 from faim_hcs.io.MolecularDevicesImageXpress import _list_dataset_files
 
 
-def parse_files_zmb(path):
+def parse_files_zmb(path, query=None):
     """Parse files from a Molecular Devices ImageXpress dataset for ZMB setup."""
     _METASERIES_FILENAME_PATTERN_ZMB_2D = (
         r"(?P<name>.*)_(?P<well>[A-Z]+"
@@ -25,8 +25,8 @@ def parse_files_zmb(path):
         )
     )
 
-    files = files.query("field == 's1'")
-    print(files)
+    if not query=="":
+        files = files.query(query).copy()
 
     # mode detection
     if files['z'].isnull().all():
