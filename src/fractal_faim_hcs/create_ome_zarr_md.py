@@ -9,6 +9,8 @@ from faim_hcs.io.MolecularDevicesImageXpress import parse_files
 from faim_hcs.Zarr import build_zarr_scaffold
 from pydantic.decorator import validate_arguments
 
+from fractal_faim_hcs.parse_zmb import parse_files_zmb
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,6 +22,7 @@ def create_ome_zarr_md(
     metadata: dict[str, Any],
     zarr_name: str = "Plate",
     mode: str = "all",
+    query: str = "",
     order_name: str = "example-order",
     barcode: str = "example-barcode",
     overwrite: bool = True,
@@ -32,8 +35,10 @@ def create_ome_zarr_md(
     :param output_path: Path to the output file (Fractal managed)
     :param metadata: Metadata dictionary (Fractal managed)
     :param zarr_name: Name of the zarr plate file that will be created
-    :param mode: Mode can be 3 values: "z-steps" (only parse the 3D data),
-                 "top-level" (only parse the 2D data), "all" (parse both)
+    :param mode: Mode can be 4 values: "z-steps" (only parse the 3D data),
+                 "top-level" (only parse the 2D data), "all" (parse both),
+                 "zmb" (zmb-parser, detect mode automatically)
+    :param query: Pandas query to filter intput-filenames
     :param order_name: Name of the order
     :param barcode: Barcode of the plate
     :param overwrite: Whether to overwrite the zarr file if it already exists
@@ -51,13 +56,19 @@ def create_ome_zarr_md(
         )
     order_name = (order_name,)
 
-    valid_modes = ("z-steps", "top-level", "all")
+    valid_modes = ("z-steps", "top-level", "all", "zmb")
     if mode not in valid_modes:
         raise NotImplementedError(
             f"Only implemented for modes {valid_modes}, but got mode {mode=}"
         )
-
-    files = parse_files(input_paths[0], mode=mode)
+    if mode=='zmb':
+        files, _ = parse_files_zmb(input_paths[0], query)
+    else:
+        if not query=="":
+            raise NotImplementedError(
+                "Filtering is only implemented in zmb mode"
+            )
+        files = parse_files(input_paths[0], mode=mode)
 
     if overwrite and exists(join(output_path, zarr_name + ".zarr")):
         # Remove zarr if it already exists.
@@ -90,6 +101,7 @@ def create_ome_zarr_md(
         "coarsening_xy": 2,
         "channels": sorted(files["channel"].unique().tolist()),
         "mode": mode,
+        "query": query,
         "original_paths": input_paths[:],
     }
     return metadata_update

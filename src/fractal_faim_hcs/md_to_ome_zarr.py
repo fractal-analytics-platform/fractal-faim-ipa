@@ -10,6 +10,7 @@ from faim_hcs.MetaSeriesUtils import (
     get_well_image_CYX,
     get_well_image_CZYX,
     montage_grid_image_YX,
+    montage_stage_pos_image_YX,
 )
 from faim_hcs.Zarr import (
     write_cyx_image_to_well,
@@ -17,6 +18,8 @@ from faim_hcs.Zarr import (
     write_roi_table,
 )
 from pydantic.decorator import validate_arguments
+
+from fractal_faim_hcs.parse_zmb import parse_files_zmb
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +31,7 @@ def md_to_ome_zarr(
     output_path: str,
     component: str,
     metadata: dict[str, Any],
+    grid_montage: bool = True,
 ) -> dict[str, Any]:
     """
     Converts the image data from the MD image Xpress into OME-Zarr.
@@ -37,14 +41,21 @@ def md_to_ome_zarr(
     :param component: Component name, e.g. "plate_name.zarr/B/03/0"
                       (Fractal managed)
     :param metadata: Metadata dictionary (Fractal managed)
+    :param grid_montage: Force FOVs into closest grid cells
     :return: Metadata dictionary (no updated metadata => empty dict)
     """
     channels = metadata["channels"]
     well = component.split("/")[1] + component.split("/")[2].zfill(2)
     mode = metadata["mode"]
     images_path = metadata["original_paths"][0]
+    query = metadata["query"]
 
-    valid_modes = ("z-steps", "top-level", "all")
+    if grid_montage:
+        montage_fn = montage_grid_image_YX
+    else:
+        montage_fn = montage_stage_pos_image_YX
+
+    valid_modes = ("z-steps", "top-level", "all", "zmb")
     if mode not in valid_modes:
         raise NotImplementedError(
             f"Only implemented for modes {valid_modes}, but got mode {mode=}"
@@ -55,7 +66,15 @@ def md_to_ome_zarr(
     # Can probably build this from input_path + component?
     plate = zarr.open(Path(output_path) / component.split("/")[0], mode="r+")
 
-    files = parse_files(images_path, mode=mode)
+    if mode=='zmb':
+        files, mode = parse_files_zmb(images_path, query)
+    else:
+        if not query=="":
+            raise NotImplementedError(
+                "Filtering is only implemented in zmb mode"
+            )
+        files = parse_files(images_path, mode=mode)
+
     well_files = files[files["well"] == well]
 
     # Get the zeroth field of the well.
@@ -85,7 +104,7 @@ def md_to_ome_zarr(
         ) = get_well_image_CYX(
             well_files=projection_files,
             channels=channels,
-            assemble_fn=montage_grid_image_YX,
+            assemble_fn=montage_fn,
         )
         # Should we also write proj_roi_tables? Unclear whether we should have
         # separate ROI tables for projections
@@ -105,7 +124,7 @@ def md_to_ome_zarr(
         img, hists, ch_metadata, metadata, roi_tables = get_well_image_CYX(
             well_files=stack_files,
             channels=channels,
-            assemble_fn=montage_grid_image_YX,
+            assemble_fn=montage_fn,
         )
         write_cyx_image_to_well(img, hists, ch_metadata, metadata, field)
     else:
@@ -118,7 +137,7 @@ def md_to_ome_zarr(
         ) = get_well_image_CZYX(
             well_files=stack_files,
             channels=channels,
-            assemble_fn=montage_grid_image_YX,
+            assemble_fn=montage_fn,
         )
         write_czyx_image_to_well(
             stack, stack_hist, stack_ch_metadata, stack_metadata, field, True
