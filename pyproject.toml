@@ -37,7 +37,7 @@ dependencies = [
     "fractal-tasks-core==0.10.0",
     "pydantic",
     "zarr",
-    "faim-hcs @ git+https://github.com/jluethi/faim-hcs.git@zmb_parsing",
+    "faim-hcs @ git+https://github.com/jluethi/faim-hcs.git@generalized_wavelength_extraction",
 ]
 
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
