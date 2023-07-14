@@ -28,7 +28,7 @@
           },
           "mode": {
             "default": "all",
-            "description": "Mode can be 3 values: \"z-steps\" (only parse the 3D data), \"top-level\" (only parse the 2D data), \"all\" (parse both)",
+            "description": "Mode can be 4 values: \"z-steps\" (only parse the 3D data), \"top-level\" (only parse the 2D data), \"all\" (parse both), \"zmb\" (zmb-parser, detect mode automatically)",
             "title": "Mode",
             "type": "string"
           },
@@ -53,6 +53,12 @@
             "description": "Whether to overwrite the zarr file if it already exists",
             "title": "Overwrite",
             "type": "boolean"
+          },
+          "query": {
+            "default": "",
+            "description": "Pandas query to filter intput-filenames",
+            "title": "Query",
+            "type": "string"
           },
           "zarr_name": {
             "default": "Plate",
@@ -89,6 +95,12 @@
             "description": "Component name, e.g. \"plate_name.zarr/B/03/0\" (Fractal managed)",
             "title": "Component",
             "type": "string"
+          },
+          "grid_montage": {
+            "default": true,
+            "description": "Force FOVs into closest grid cells",
+            "title": "Grid Montage",
+            "type": "boolean"
           },
           "input_paths": {
             "description": "List of paths to the input files (Fractal managed)",
