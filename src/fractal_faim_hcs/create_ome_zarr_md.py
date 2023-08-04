@@ -22,6 +22,7 @@ def create_ome_zarr_md(
     metadata: dict[str, Any],
     zarr_name: str = "Plate",
     mode: str = "all",
+    layout: int = 96,
     query: str = "",
     order_name: str = "example-order",
     barcode: str = "example-barcode",
@@ -38,6 +39,7 @@ def create_ome_zarr_md(
     :param mode: Mode can be 4 values: "z-steps" (only parse the 3D data),
                  "top-level" (only parse the 2D data), "all" (parse both),
                  "zmb" (zmb-parser, detect mode automatically)
+    :param layout: Plate layout for the Zarr file. Valid options are 96 and 384
     :param query: Pandas query to filter intput-filenames
     :param order_name: Name of the order
     :param barcode: Barcode of the plate
@@ -61,13 +63,11 @@ def create_ome_zarr_md(
         raise NotImplementedError(
             f"Only implemented for modes {valid_modes}, but got mode {mode=}"
         )
-    if mode=='zmb':
+    if mode == "zmb":
         files, _ = parse_files_zmb(input_paths[0], query)
     else:
-        if not query=="":
-            raise NotImplementedError(
-                "Filtering is only implemented in zmb mode"
-            )
+        if not query == "":
+            raise NotImplementedError("Filtering is only implemented in zmb mode")
         files = parse_files(input_paths[0], mode=mode)
 
     if overwrite and exists(join(output_path, zarr_name + ".zarr")):
@@ -79,7 +79,7 @@ def create_ome_zarr_md(
         root_dir=output_path,
         name=zarr_name,
         files=files,
-        layout=96,
+        layout=layout,
         order_name=order_name,
         barcode=barcode,
     )

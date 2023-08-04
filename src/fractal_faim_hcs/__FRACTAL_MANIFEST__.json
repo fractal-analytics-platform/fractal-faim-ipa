@@ -21,6 +21,12 @@
             "title": "Input Paths",
             "type": "array"
           },
+          "layout": {
+            "default": 96,
+            "description": "Plate layout for the Zarr file. Valid options are 96 and 384",
+            "title": "Layout",
+            "type": "integer"
+          },
           "metadata": {
             "description": "Metadata dictionary (Fractal managed)",
             "title": "Metadata",
