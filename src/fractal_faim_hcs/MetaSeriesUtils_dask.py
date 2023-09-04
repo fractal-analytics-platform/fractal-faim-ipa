@@ -14,20 +14,21 @@ from faim_hcs.UIntHistogram import UIntHistogram
 from faim_hcs.MetaSeriesUtils import montage_grid_image_YX
 from faim_hcs.MetaSeriesUtils import get_img_YX
 from faim_hcs.MetaSeriesUtils import _build_ch_metadata
+from faim_hcs.MetaSeriesUtils import compute_z_sampling
 
 
-def compute_z_sampling(ch_z_positions: ArrayLike):
-    z_samplings = []
-    for z_positions in ch_z_positions:
-        if z_positions is not None and None not in z_positions:
-            precision = -Decimal(str(z_positions[0])).as_tuple().exponent
-            z_step = np.round(np.mean(np.diff(z_positions)), decimals=precision)
-            z_samplings.append(z_step)
+# def compute_z_sampling(ch_z_positions: ArrayLike):
+#     z_samplings = []
+#     for z_positions in ch_z_positions:
+#         if z_positions is not None and None not in z_positions:
+#             precision = -Decimal(str(z_positions[0])).as_tuple().exponent
+#             z_step = np.round(np.mean(np.diff(z_positions)), decimals=precision)
+#             z_samplings.append(z_step)
 
-    return np.mean(z_samplings)
+#     return np.mean(z_samplings)
 
 
-def get_well_image_CZYX(
+def get_well_image_CZYX_lazy(
     well_files: pd.DataFrame,
     channels: list[str],
     assemble_fn: Callable = montage_grid_image_YX,
@@ -36,12 +37,12 @@ def get_well_image_CZYX(
     # TODO: This function assumes that there are no gaps in data (i.e. that
     # there are no images missing to fill a full FCZ-stack)
     # -> maybe implement checks
-
+    
     planes = sorted(well_files["z"].unique(),
                     key=int)
     fields = sorted(well_files["field"].unique(),
                     key=lambda s: int(re.findall('(\d+)',s)[0]))
-
+    
     # Create an empty np array to store the filenames in the correct structure
     fn_dtype = f"<U{max([len(fn) for fn in well_files['path']])}"
     fns_np = np.empty((
@@ -61,6 +62,7 @@ def get_well_image_CZYX(
                 assert len(plane_files) == 1, "Multiple files for one FCZ found"
                 fns_np[s,c,z] = list(plane_files['path'])[0]
     
+    # TODO: combine fields into one chunk
     fns_da = da.from_array(fns_np, chunks=(1,)*len(fns_np.shape))
 
 
@@ -72,6 +74,7 @@ def get_well_image_CZYX(
         _, img, *_ = get_img_YX(assemble_fn, files)
         return img.reshape(x.shape[1:] + img.shape)
     
+    # TODO: could be done without loading images
     # calculate one plane to get dimensions and dtype
     sample_fused = _fuse_xy(fns_da[:,0,0].compute())
     (nx_tot, ny_tot) = sample_fused.shape
@@ -98,7 +101,7 @@ def get_well_image_CZYX(
         x_pos = ms_metadata['stage-position-x']
         y_pos = ms_metadata['stage-position-y']
         z_pos = ms_metadata['z-position']
-        output = np.array([x_pos, y_pos, z_pos], dtype='float32')
+        output = np.array([x_pos, y_pos, z_pos], dtype='float64')
         newshape = x.shape + output.shape
         return np.reshape(output, newshape)
 
@@ -109,7 +112,7 @@ def get_well_image_CZYX(
             fns_da.shape + (3,)
         ),
         new_axis=len(fns_da.shape),
-        meta=np.asanyarray([]).astype('float32')
+        meta=np.asanyarray([]).astype('float64')
     )
     stage_positions = stage_positions_da.compute()
     z_positions = np.mean(stage_positions[:,:,:,2], axis=0)
@@ -118,7 +121,7 @@ def get_well_image_CZYX(
     z_sampling = compute_z_sampling(z_positions)
 
 
-    # LOAD ROI_TABLES AND PX_METADATA:
+    # GENERATE ROI_TABLES AND PX_METADATA:
     # (by only loading one plane)
     # TODO: Could also be done without loading images of entire plane
     fns_sel = fns_da[:,0,0].compute()
@@ -173,7 +176,7 @@ def get_well_image_CZYX(
 
 
 
-def get_well_image_CYX(
+def get_well_image_CYX_lazy(
     well_files: pd.DataFrame,
     channels: list[str],
     assemble_fn: Callable = montage_grid_image_YX,

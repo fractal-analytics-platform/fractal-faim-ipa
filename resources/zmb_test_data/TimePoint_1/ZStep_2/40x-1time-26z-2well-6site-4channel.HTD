@@ -1,0 +1,35 @@
+"HTSInfoFile", Version 1.0
+"Description", "test"
+"PlateType", 2
+"TimePoints", 1
+"ZSeries", TRUE
+"ZSteps", 26
+"ZProjection", FALSE
+"XWells", 12
+"YWells", 8
+"WellsSelection1", FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
+"WellsSelection2", FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
+"WellsSelection3", FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
+"WellsSelection4", FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
+"WellsSelection5", FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
+"WellsSelection6", FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
+"WellsSelection7", FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
+"WellsSelection8", FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE
+"Sites", TRUE
+"XSites", 3
+"YSites", 3
+"SiteSelection1", TRUE, TRUE, TRUE
+"SiteSelection2", FALSE, TRUE, TRUE
+"SiteSelection3", FALSE, FALSE, TRUE
+"Waves", TRUE
+"NWavelengths", 4
+"WaveName1", "DAPI"
+"WaveName2", "FITC"
+"WaveName3", "Texas Red"
+"WaveName4", "Cy5"
+"WaveCollect1", 1
+"WaveCollect2", 1
+"WaveCollect3", 1
+"WaveCollect4", 1
+"UniquePlateIdentifier", "c66340dd-269c-45dc-a7bb-071246f177d0"
+"EndFile"

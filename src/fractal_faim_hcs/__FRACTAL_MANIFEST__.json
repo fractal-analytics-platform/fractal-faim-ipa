@@ -126,6 +126,12 @@
             "default": true,
             "type": "boolean",
             "description": "Force FOVs into closest grid cells"
+          },
+          "memory_efficient": {
+            "title": "Memory Efficient",
+            "default": true,
+            "type": "boolean",
+            "description": "Load images via dask (more memory efficient for 3D)"
           }
         },
         "required": [

@@ -7,8 +7,8 @@ from typing import Any
 import zarr
 from faim_hcs.io.MolecularDevicesImageXpress import parse_files
 from faim_hcs.MetaSeriesUtils import (
-    # get_well_image_CYX,
-    # get_well_image_CZYX,
+    get_well_image_CYX,
+    get_well_image_CZYX,
     montage_grid_image_YX,
     montage_stage_pos_image_YX,
 )
@@ -21,8 +21,8 @@ from pydantic.decorator import validate_arguments
 
 from fractal_faim_hcs.parse_zmb import parse_files_zmb
 from fractal_faim_hcs.MetaSeriesUtils_dask import (
-    get_well_image_CYX,
-    get_well_image_CZYX,
+    #get_well_image_CYX_lazy,
+    get_well_image_CZYX_lazy,
 )
 
 logger = logging.getLogger(__name__)
@@ -36,6 +36,7 @@ def md_to_ome_zarr(
     component: str,
     metadata: dict[str, Any],
     grid_montage: bool = True,
+    memory_efficient: bool = True,
 ) -> dict[str, Any]:
     """
     Converts the image data from the MD image Xpress into OME-Zarr.
@@ -46,8 +47,14 @@ def md_to_ome_zarr(
                       (Fractal managed)
     :param metadata: Metadata dictionary (Fractal managed)
     :param grid_montage: Force FOVs into closest grid cells
+    :param memory_efficient: Load images via dask (more memory efficient for 3D)
     :return: Metadata dictionary (no updated metadata => empty dict)
     """
+    if memory_efficient:
+        get_well_image_CZYX_callable = get_well_image_CZYX_lazy
+    else:
+        get_well_image_CZYX_callable = get_well_image_CZYX
+
     channels = metadata["channels"]
     well = component.split("/")[1] + component.split("/")[2].zfill(2)
     mode = metadata["mode"]
@@ -138,7 +145,7 @@ def md_to_ome_zarr(
             stack_ch_metadata,
             stack_metadata,
             roi_tables,
-        ) = get_well_image_CZYX(
+        ) = get_well_image_CZYX_callable(
             well_files=stack_files,
             channels=channels,
             assemble_fn=montage_fn,
