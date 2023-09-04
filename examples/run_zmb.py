@@ -44,7 +44,8 @@ input_paths = [
 # ]
 
 mode = "zmb"
-query = "well=='D05' and field==['s1','s2','s3']"
+#query = "well=='D05' and field==['s1','s2','s3']"
+query = ""
 grid_montage = False
 output_name = "Test_ZMB_3D_new"
 

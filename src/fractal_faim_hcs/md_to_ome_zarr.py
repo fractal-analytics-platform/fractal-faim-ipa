@@ -7,8 +7,8 @@ from typing import Any
 import zarr
 from faim_hcs.io.MolecularDevicesImageXpress import parse_files
 from faim_hcs.MetaSeriesUtils import (
-    get_well_image_CYX,
-    get_well_image_CZYX,
+    # get_well_image_CYX,
+    # get_well_image_CZYX,
     montage_grid_image_YX,
     montage_stage_pos_image_YX,
 )
@@ -20,6 +20,10 @@ from faim_hcs.Zarr import (
 from pydantic.decorator import validate_arguments
 
 from fractal_faim_hcs.parse_zmb import parse_files_zmb
+from fractal_faim_hcs.MetaSeriesUtils_dask import (
+    get_well_image_CYX,
+    get_well_image_CZYX,
+)
 
 logger = logging.getLogger(__name__)
 
