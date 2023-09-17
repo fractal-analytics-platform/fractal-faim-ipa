@@ -1,21 +1,19 @@
-from decimal import Decimal
-from typing import Any, Callable, Optional, Union
-from pathlib import Path
-
 import re
+from pathlib import Path
+from typing import Callable
+
 import dask.array as da
 import numpy as np
 import pandas as pd
-from tifffile import tifffile
-from numpy._typing import ArrayLike
-
+from faim_hcs.MetaSeriesUtils import (
+    _build_ch_metadata,
+    compute_z_sampling,
+    get_img_YX,
+    montage_grid_image_YX,
+)
 from faim_hcs.UIntHistogram import UIntHistogram
-
-from faim_hcs.MetaSeriesUtils import montage_grid_image_YX
-from faim_hcs.MetaSeriesUtils import get_img_YX
-from faim_hcs.MetaSeriesUtils import _build_ch_metadata
-from faim_hcs.MetaSeriesUtils import compute_z_sampling
-
+from numpy._typing import ArrayLike
+from tifffile import tifffile
 
 # def compute_z_sampling(ch_z_positions: ArrayLike):
 #     z_samplings = []
@@ -28,7 +26,7 @@ from faim_hcs.MetaSeriesUtils import compute_z_sampling
 #     return np.mean(z_samplings)
 
 
-def get_well_image_CZYX_lazy(
+def get_well_image_CZYX_lazy(  # noqa: C901
     well_files: pd.DataFrame,
     channels: list[str],
     assemble_fn: Callable = montage_grid_image_YX,
@@ -37,21 +35,23 @@ def get_well_image_CZYX_lazy(
     # TODO: This function assumes that there are no gaps in data (i.e. that
     # there are no images missing to fill a full FCZ-stack)
     # -> maybe implement checks
-    
-    planes = sorted(well_files["z"].unique(),
-                    key=int)
-    fields = sorted(well_files["field"].unique(),
-                    key=lambda s: int(re.findall('(\d+)',s)[0]))
-    
+
+    planes = sorted(well_files["z"].unique(), key=int)
+    fields = sorted(
+        well_files["field"].unique(), key=lambda s: int(re.findall(r"(\d+)", s)[0])
+    )
+
     # Create an empty np array to store the filenames in the correct structure
     fn_dtype = f"<U{max([len(fn) for fn in well_files['path']])}"
-    fns_np = np.empty((
-        len(fields),
-        len(channels),
-        len(planes),
+    fns_np = np.empty(
+        (
+            len(fields),
+            len(channels),
+            len(planes),
         ),
-        dtype=fn_dtype)
-    
+        dtype=fn_dtype,
+    )
+
     # Store fns in correct position
     for s, field in enumerate(fields):
         field_files = well_files[well_files["field"] == field]
@@ -60,11 +60,10 @@ def get_well_image_CZYX_lazy(
             for z, plane in enumerate(planes):
                 plane_files = channel_files[channel_files["z"] == plane]
                 assert len(plane_files) == 1, "Multiple files for one FCZ found"
-                fns_np[s,c,z] = list(plane_files['path'])[0]
-    
-    # TODO: combine fields into one chunk
-    fns_da = da.from_array(fns_np, chunks=(1,)*len(fns_np.shape))
+                fns_np[s, c, z] = list(plane_files["path"])[0]
 
+    # TODO: combine fields into one chunk
+    fns_da = da.from_array(fns_np, chunks=(1,) * len(fns_np.shape))
 
     # MONTAGE PLANES
     def _fuse_xy(x):
@@ -73,66 +72,62 @@ def get_well_image_CZYX_lazy(
         files = pd.DataFrame(fns, columns=["path"])
         _, img, *_ = get_img_YX(assemble_fn, files)
         return img.reshape(x.shape[1:] + img.shape)
-    
+
     # TODO: could be done without loading images
     # calculate one plane to get dimensions and dtype
-    sample_fused = _fuse_xy(fns_da[:,0,0].compute())
+    sample_fused = _fuse_xy(fns_da[:, 0, 0].compute())
     (nx_tot, ny_tot) = sample_fused.shape
-    
+
     # create dask array of assembled planes
     imgs_fused_da = da.map_blocks(
         _fuse_xy,
         fns_da,
         chunks=da.core.normalize_chunks(
-            (1,)*len(fns_da.shape[1:]) + (nx_tot,ny_tot),
-            shape=fns_da.shape[1:]+(nx_tot,ny_tot)
+            (1,) * len(fns_da.shape[1:]) + (nx_tot, ny_tot),
+            shape=fns_da.shape[1:] + (nx_tot, ny_tot),
         ),
-        drop_axis = 0,
-        new_axis = range(len(fns_da.shape)-1, len(fns_da.shape)+1),
-        meta=np.asanyarray([]).astype(sample_fused.dtype)
+        drop_axis=0,
+        new_axis=range(len(fns_da.shape) - 1, len(fns_da.shape) + 1),
+        meta=np.asanyarray([]).astype(sample_fused.dtype),
     )
-
 
     # LOAD STAGE POSITIONS:
     # TODO: maybe only read z-positions
     def da_read_metadata(x):
         fn = x.flatten()[0]
         ms_metadata = load_metaseries_tiff_metadata(fn)
-        x_pos = ms_metadata['stage-position-x']
-        y_pos = ms_metadata['stage-position-y']
-        z_pos = ms_metadata['z-position']
-        output = np.array([x_pos, y_pos, z_pos], dtype='float64')
+        x_pos = ms_metadata["stage-position-x"]
+        y_pos = ms_metadata["stage-position-y"]
+        z_pos = ms_metadata["z-position"]
+        output = np.array([x_pos, y_pos, z_pos], dtype="float64")
         newshape = x.shape + output.shape
         return np.reshape(output, newshape)
 
     stage_positions_da = fns_da.map_blocks(
         da_read_metadata,
         chunks=da.core.normalize_chunks(
-            (1,)*len(fns_da.shape) + (3,),
-            fns_da.shape + (3,)
+            (1,) * len(fns_da.shape) + (3,), (*fns_da.shape, 3)
         ),
         new_axis=len(fns_da.shape),
-        meta=np.asanyarray([]).astype('float64')
+        meta=np.asanyarray([]).astype("float64"),
     )
     stage_positions = stage_positions_da.compute()
-    z_positions = np.mean(stage_positions[:,:,:,2], axis=0)
+    z_positions = np.mean(stage_positions[:, :, :, 2], axis=0)
     # TODO: This gives slightly different results than in the original code
     # possibly due to different precisions being used
     z_sampling = compute_z_sampling(z_positions)
 
-
     # GENERATE ROI_TABLES AND PX_METADATA:
     # (by only loading one plane)
     # TODO: Could also be done without loading images of entire plane
-    fns_sel = fns_da[:,0,0].compute()
+    fns_sel = fns_da[:, 0, 0].compute()
     files = pd.DataFrame(fns_sel, columns=["path"])
     px_metadata, _, _, _, roi_tables = get_img_YX(assemble_fn, files)
-    
+
     px_metadata["z-scaling"] = z_sampling
-    
+
     for roi_table in roi_tables.values():
-        roi_table["len_z_micrometer"] = z_sampling*(imgs_fused_da.shape[1] - 1)
-    
+        roi_table["len_z_micrometer"] = z_sampling * (imgs_fused_da.shape[1] - 1)
 
     # LOAD CHANNEL-METADATA
     def load_channel_metadata(fn):
@@ -141,39 +136,39 @@ def get_well_image_CZYX_lazy(
 
     channel_metadata = []
     for c in range(len(channels)):
-        fn = fns_np[0,c,0]
+        fn = fns_np[0, c, 0]
         channel_metadata.append(load_channel_metadata(fn))
-
 
     # LOAD UINTHISTOGRAMS
     # TODO: See if this can be done more efficiently
     def _load_histo(x):
         histo = UIntHistogram(x)
         return np.array([[histo]])
-    
+
     histos_da = imgs_fused_da.map_blocks(
         _load_histo,
-        chunks=(1,1),
-        drop_axis = (2,3,),
-        meta=np.asanyarray([UIntHistogram()])
+        chunks=(1, 1),
+        drop_axis=(
+            2,
+            3,
+        ),
+        meta=np.asanyarray([UIntHistogram()]),
     )
     histos = histos_da.compute()
     channel_histograms = []
     for c, _ in enumerate(channels):
         channel_histogram = UIntHistogram()
         for z, _ in enumerate(planes):
-            channel_histogram.combine(histos[c,z])
+            channel_histogram.combine(histos[c, z])
         channel_histograms.append(channel_histogram)
-
 
     return (
         imgs_fused_da,
         channel_histograms,
         channel_metadata,
         px_metadata,
-        roi_tables
+        roi_tables,
     )
-
 
 
 def get_well_image_CYX_lazy(
@@ -193,27 +188,28 @@ def get_well_image_CYX_lazy(
     :return: CYX image, channel-histograms, channel-metadata, general-metadata,
                 roi-tables dictionary
     """
-
-    fields = sorted(well_files["field"].unique(),
-                    key=lambda s: int(re.findall('(\d+)',s)[0]))
+    fields = sorted(
+        well_files["field"].unique(), key=lambda s: int(re.findall(r"(\d+)", s)[0])
+    )
 
     # Create an empty np array to store the filenames in the correct structure
     fn_dtype = f"<U{max([len(fn) for fn in well_files['path']])}"
-    fns_np = np.empty((
-        len(fields),
-        len(channels),
+    fns_np = np.empty(
+        (
+            len(fields),
+            len(channels),
         ),
-        dtype=fn_dtype)
-    
+        dtype=fn_dtype,
+    )
+
     # Store fns in correct position
     for s, field in enumerate(fields):
         field_files = well_files[well_files["field"] == field]
         for c, channel in enumerate(channels):
             channel_files = field_files[field_files["channel"] == channel]
-            fns_np[s,c] = list(channel_files['path'])[0]
-    
-    fns_da = da.from_array(fns_np, chunks=(1,)*len(fns_np.shape))
+            fns_np[s, c] = list(channel_files["path"])[0]
 
+    fns_da = da.from_array(fns_np, chunks=(1,) * len(fns_np.shape))
 
     # MONTAGE PLANES
     def _fuse_xy(x):
@@ -222,31 +218,30 @@ def get_well_image_CYX_lazy(
         files = pd.DataFrame(fns, columns=["path"])
         _, img, *_ = get_img_YX(assemble_fn, files)
         return img.reshape(x.shape[1:] + img.shape)
-    
+
     # calculate one channel to get dimensions and dtype
-    sample_fused = _fuse_xy(fns_da[:,0].compute())
+    sample_fused = _fuse_xy(fns_da[:, 0].compute())
     (nx_tot, ny_tot) = sample_fused.shape
-    
+
     # create dask array of assembled planes
     imgs_fused_da = da.map_blocks(
         _fuse_xy,
         fns_da,
         chunks=da.core.normalize_chunks(
-            (1,)*len(fns_da.shape[1:]) + (nx_tot,ny_tot),
-            shape=fns_da.shape[1:]+(nx_tot,ny_tot)
+            (1,) * len(fns_da.shape[1:]) + (nx_tot, ny_tot),
+            shape=fns_da.shape[1:] + (nx_tot, ny_tot),
         ),
-        drop_axis = 0,
-        new_axis = range(len(fns_da.shape)-1, len(fns_da.shape)+1),
-        meta=np.asanyarray([]).astype(sample_fused.dtype)
+        drop_axis=0,
+        new_axis=range(len(fns_da.shape) - 1, len(fns_da.shape) + 1),
+        meta=np.asanyarray([]).astype(sample_fused.dtype),
     )
 
     # LOAD ROI_TABLES AND PX_METADATA:
     # (by only loading one channel)
     # TODO: Could also be done without loading images of entire plane
-    fns_sel = fns_da[:,0].compute()
+    fns_sel = fns_da[:, 0].compute()
     files = pd.DataFrame(fns_sel, columns=["path"])
     px_metadata, _, _, _, roi_tables = get_img_YX(assemble_fn, files)
-    
 
     # LOAD CHANNEL-METADATA
     def load_channel_metadata(fn):
@@ -255,21 +250,23 @@ def get_well_image_CYX_lazy(
 
     channel_metadata = []
     for c in range(len(channels)):
-        fn = fns_np[0,c]
+        fn = fns_np[0, c]
         channel_metadata.append(load_channel_metadata(fn))
-
 
     # LOAD UINTHISTOGRAMS
     # TODO: See if this can be done more efficiently
     def _load_histo(x):
         histo = UIntHistogram(x)
         return np.array([histo])
-        
+
     histos_da = imgs_fused_da.map_blocks(
         _load_histo,
         chunks=(1,),
-        drop_axis = (1,2,),
-        meta=np.asanyarray([UIntHistogram()])
+        drop_axis=(
+            1,
+            2,
+        ),
+        meta=np.asanyarray([UIntHistogram()]),
     )
     histos = histos_da.compute()
     channel_histograms = []
@@ -281,9 +278,8 @@ def get_well_image_CYX_lazy(
         channel_histograms,
         channel_metadata,
         px_metadata,
-        roi_tables
+        roi_tables,
     )
-
 
 
 def load_metaseries_tiff_metadata(path: Path) -> dict:
@@ -345,6 +341,6 @@ def load_metaseries_tiff_metadata(path: Path) -> dict:
         for metadata_key in plane_info:
             if metadata_key.endswith("Intensity"):
                 metadata[metadata_key] = plane_info[metadata_key]
-        #metadata["PixelType"] = str(data.dtype)
+        # metadata["PixelType"] = str(data.dtype)
 
     return metadata
