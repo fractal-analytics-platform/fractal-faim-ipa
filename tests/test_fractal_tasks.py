@@ -124,8 +124,8 @@ def test_ome_zarr_conversion_mode_all_fractal_tasks():
     assert list(df_fov.columns) == roi_columns
     assert len(df_fov) == 2
     target_values = [
-        0.0,
         699.8015747070312,
+        0.0,
         0.0,
         699.8015747070312,
         699.8015747070312,
@@ -199,8 +199,8 @@ def test_ome_zarr_conversion_mode_2D_fractal_tasks():
     assert list(df_fov.columns) == roi_columns
     assert len(df_fov) == 2
     target_values = [
-        0.0,
         699.8015747070312,
+        0.0,
         0.0,
         699.8015747070312,
         699.8015747070312,
