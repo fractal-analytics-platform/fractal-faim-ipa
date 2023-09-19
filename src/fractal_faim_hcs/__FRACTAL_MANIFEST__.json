@@ -91,7 +91,9 @@
         "mem": 1000
       },
       "name": "Create OME-Zarr MD",
-      "output_type": "zarr"
+      "output_type": "zarr",
+      "docs_info": "Create OME-Zarr plate from MD Image Xpress files.",
+      "docs_link": "https://github.com/jluethi/fractal-faim-hcs"
     },
     {
       "args_schema": {
@@ -129,7 +131,7 @@
           },
           "memory_efficient": {
             "title": "Memory Efficient",
-            "default": true,
+            "default": false,
             "type": "boolean",
             "description": "Load images via dask (more memory efficient for 3D)"
           }
@@ -151,7 +153,9 @@
         "parallelization_level": "image"
       },
       "name": "Convert MD to OME-Zarr",
-      "output_type": "zarr"
+      "output_type": "zarr",
+      "docs_info": "Converts the image data from the MD image Xpress into OME-Zarr.",
+      "docs_link": "https://github.com/jluethi/fractal-faim-hcs"
     }
   ]
 }
