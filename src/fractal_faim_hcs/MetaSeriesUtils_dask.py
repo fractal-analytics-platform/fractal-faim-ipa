@@ -191,6 +191,7 @@ def get_well_image_CYX_lazy(
     fields = sorted(
         well_files["field"].unique(), key=lambda s: int(re.findall(r"(\d+)", s)[0])
     )
+    pass
 
     # Create an empty np array to store the filenames in the correct structure
     fn_dtype = f"<U{max([len(fn) for fn in well_files['path']])}"
