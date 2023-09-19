@@ -19,36 +19,39 @@ from faim_hcs.Zarr import (
 )
 from pydantic.decorator import validate_arguments
 
-from fractal_faim_hcs.parse_zmb import parse_files_zmb
 from fractal_faim_hcs.MetaSeriesUtils_dask import (
-    #get_well_image_CYX_lazy,
+    # get_well_image_CYX_lazy,
     get_well_image_CZYX_lazy,
 )
+from fractal_faim_hcs.parse_zmb import parse_files_zmb
 
 logger = logging.getLogger(__name__)
 
 
 @validate_arguments
-def md_to_ome_zarr(
+def md_to_ome_zarr(  # noqa: C901
     *,
     input_paths: Sequence[str],
     output_path: str,
     component: str,
     metadata: dict[str, Any],
     grid_montage: bool = True,
-    memory_efficient: bool = True,
+    memory_efficient: bool = False,
 ) -> dict[str, Any]:
     """
     Converts the image data from the MD image Xpress into OME-Zarr.
 
-    :param input_paths: List of paths to the input files (Fractal managed)
-    :param output_path: Path to the output file (Fractal managed)
-    :param component: Component name, e.g. "plate_name.zarr/B/03/0"
+    Args:
+        input_paths: List of paths to the input files (Fractal managed)
+        output_path: Path to the output file (Fractal managed)
+        component: Component name, e.g. "plate_name.zarr/B/03/0"
                       (Fractal managed)
-    :param metadata: Metadata dictionary (Fractal managed)
-    :param grid_montage: Force FOVs into closest grid cells
-    :param memory_efficient: Load images via dask (more memory efficient for 3D)
-    :return: Metadata dictionary (no updated metadata => empty dict)
+        metadata: Metadata dictionary (Fractal managed)
+        grid_montage: Force FOVs into closest grid cells
+        memory_efficient: Load images via dask (more memory efficient for 3D)
+
+    Returns:
+        Metadata dictionary (no updated metadata => empty dict)
     """
     if memory_efficient:
         get_well_image_CZYX_callable = get_well_image_CZYX_lazy
@@ -77,13 +80,11 @@ def md_to_ome_zarr(
     # Can probably build this from input_path + component?
     plate = zarr.open(Path(output_path) / component.split("/")[0], mode="r+")
 
-    if mode=='zmb':
+    if mode == "zmb":
         files, mode = parse_files_zmb(images_path, query)
     else:
-        if not query=="":
-            raise NotImplementedError(
-                "Filtering is only implemented in zmb mode"
-            )
+        if not query == "":
+            raise NotImplementedError("Filtering is only implemented in zmb mode")
         files = parse_files(images_path, mode=mode)
 
     well_files = files[files["well"] == well]
