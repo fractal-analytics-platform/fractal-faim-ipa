@@ -32,20 +32,22 @@ def create_ome_zarr_md(
     """
     Create OME-Zarr plate from MD Image Xpress files.
 
-    :param input_paths: List of paths to the input files (Fractal managed)
-    :param output_path: Path to the output file (Fractal managed)
-    :param metadata: Metadata dictionary (Fractal managed)
-    :param zarr_name: Name of the zarr plate file that will be created
-    :param mode: Mode can be 4 values: "z-steps" (only parse the 3D data),
+    Args:
+        input_paths: List of paths to the input files (Fractal managed)
+        output_path: Path to the output file (Fractal managed)
+        metadata: Metadata dictionary (Fractal managed)
+        zarr_name: Name of the zarr plate file that will be created
+        mode: Mode can be 4 values: "z-steps" (only parse the 3D data),
                  "top-level" (only parse the 2D data), "all" (parse both),
                  "zmb" (zmb-parser, detect mode automatically)
-    :param layout: Plate layout for the Zarr file. Valid options are 96 and 384
-    :param query: Pandas query to filter intput-filenames
-    :param order_name: Name of the order
-    :param barcode: Barcode of the plate
-    :param overwrite: Whether to overwrite the zarr file if it already exists
-    :param num_levels: Number of levels to generate in the zarr file
-    :return: Metadata dictionary
+        layout: Plate layout for the Zarr file. Valid options are 96 and 384
+        query: Pandas query to filter intput-filenames
+        order_name: Name of the order
+        barcode: Barcode of the plate
+        overwrite: Whether to overwrite the zarr file if it already exists
+        num_levels: Number of levels to generate in the zarr file
+    Returns:
+        Metadata dictionary
     """
     # FIXME: Find a way to figure out here how many levels will be generated
     # (to be able to put it into the num_levels metadata)

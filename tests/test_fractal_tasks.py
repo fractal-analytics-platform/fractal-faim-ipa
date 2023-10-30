@@ -10,7 +10,8 @@ from fractal_faim_hcs.create_ome_zarr_md import create_ome_zarr_md
 from fractal_faim_hcs.md_to_ome_zarr import md_to_ome_zarr
 
 
-def test_ome_zarr_conversion_mode_all_fractal_tasks():
+@pytest.mark.parametrize(("memory_efficient"), (True, False))
+def test_ome_zarr_conversion_mode_all_fractal_tasks(memory_efficient):
     ROOT_DIR = Path(__file__).parent
     input_paths = [str(join(ROOT_DIR.parent, "resources", "Projection-Mix"))]
     tmp_dir = tempfile.mkdtemp()
@@ -42,6 +43,7 @@ def test_ome_zarr_conversion_mode_all_fractal_tasks():
             output_path=str(zarr_root),
             component=component,
             metadata=metatada_update,
+            memory_efficient=memory_efficient,
         )
 
     # FIXME: See https://github.com/jluethi/fractal-faim-hcs/issues/2
@@ -124,8 +126,8 @@ def test_ome_zarr_conversion_mode_all_fractal_tasks():
     assert list(df_fov.columns) == roi_columns
     assert len(df_fov) == 2
     target_values = [
-        0.0,
         699.8015747070312,
+        0.0,
         0.0,
         699.8015747070312,
         699.8015747070312,
@@ -199,8 +201,8 @@ def test_ome_zarr_conversion_mode_2D_fractal_tasks():
     assert list(df_fov.columns) == roi_columns
     assert len(df_fov) == 2
     target_values = [
-        0.0,
         699.8015747070312,
+        0.0,
         0.0,
         699.8015747070312,
         699.8015747070312,
