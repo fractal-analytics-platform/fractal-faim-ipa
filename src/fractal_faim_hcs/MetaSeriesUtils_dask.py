@@ -179,7 +179,7 @@ def get_well_image_CZYX_lazy(  # noqa: C901
     # distinguish between channels with
     #   - all z-planes
     #   - only one z-plane (stored in first plane)
-    #   - no z-planes (only projections)
+    #   - no z-planes (only projections = empty channel)
     channels_full_planes = []
     channels_one_plane = []
     channels_empty = []
@@ -194,6 +194,8 @@ def get_well_image_CZYX_lazy(  # noqa: C901
 
     # LOAD STAGE POSITIONS, CALCULATE Z_SAMPLING & ARRANGE SINGLE PLANES:
     # TODO: maybe only read z-positions
+    # stage_positions_da: dask array of image coordinates with shape 
+    # (fields,channels,planes,(x-coord,y-coord,z-coord))
     stage_positions_da = da.map_blocks(
         _da_read_stage_positions,
         da.from_array(fns_np, chunks=1),
@@ -212,7 +214,6 @@ def get_well_image_CZYX_lazy(  # noqa: C901
         stage_positions_da, channels_one_plane, z_sampling, min_z, n_z, fns_np
     )
 
-
     # GENERATE ROI_TABLES AND PX_METADATA:
     # (by only loading one plane)
     # TODO: Could also be done without loading images of entire plane
@@ -230,6 +231,7 @@ def get_well_image_CZYX_lazy(  # noqa: C901
 
 
     # MONTAGE PLANES
+    # imgs_fused_da: fused planes of shape (channels, planes, x, y)
     imgs_fused_da = da.map_blocks(
         _fuse_xy,
         da.from_array(
@@ -275,7 +277,15 @@ def get_well_image_CZYX_lazy(  # noqa: C901
 
 
     # LOAD UINTHISTOGRAMS
-    channel_histograms = load_UIntHistograms(imgs_fused_da, channels_empty)
+    # NOTE: for now, we only calculate UIntHistograms for middle z-planes
+    # because there are to be documented issues with overflows in
+    # UIntHistograms, if large datasets are processed
+    # For single-plane channels, it will probably return non-meaningfull
+    # histograms
+    channel_histograms = load_UIntHistograms(
+        imgs_fused_da[:,[imgs_fused_da.shape[1]//2]],
+        channels_empty
+    )
 
     return (
         imgs_fused_da,

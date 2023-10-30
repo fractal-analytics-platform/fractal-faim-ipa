@@ -107,13 +107,10 @@ def test_lazy_loading(tmp_path):
 
     zarr1 = zarr.open(f"{output_path}/{output_name1}.zarr/C/3/0")
     zattr1 = zarr1.attrs.asdict()
-    print(
-        zattr1["multiscales"][0]["datasets"][0]["coordinateTransformations"][0]["scale"]
-    )
     zarr2 = zarr.open(f"{output_path}/{output_name2}.zarr/C/3/0")
     zattr2 = zarr2.attrs.asdict()
-    print(
-        zattr2["multiscales"][0]["datasets"][0]["coordinateTransformations"][0]["scale"]
-    )
 
-    assert zattr1 == zattr2
+    assert zattr1["multiscales"] == zattr2["multiscales"]
+
+    # TODO: test omero metadata. Currently not always the same, because we
+    # calculate histograms differently.
