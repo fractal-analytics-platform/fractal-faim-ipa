@@ -1,11 +1,16 @@
 # Fractal example scripts
 
 from fractal_faim_hcs.create_ome_zarr_md import create_ome_zarr_md
-from fractal_faim_hcs.md_to_ome_zarr import md_to_ome_zarr
+
+# from fractal_faim_hcs.md_to_ome_zarr import md_to_ome_zarr
+
 
 input_paths = ["../resources/Projection-Mix"]
+# input_paths = ["/Users/joel/Library/CloudStorage/Dropbox/Joel/BioVisionCenter"
+#                "/Code/fractal/fractal-faim-hcs/resources/Projection-Mix"]
 # input_paths = ["/Users/joel/Desktop/230219MK004EB-R1Bleach"]
 output_path = "zarr-files"
+zarr_root = output_path
 
 order_name = "example-order"
 barcode = "example-barcode"
@@ -16,11 +21,19 @@ overwrite = True
 # mode = "top-level"
 mode = "all"
 
-output_name = "Maurice_CoordinateTransformTest"
+memory_efficient = False
+
+mode = "all"
+
+order_name = "example-order"
+barcode = "example-barcode"
+overwrite = True
+
+output_name = "OME-Zarr-Test"
 
 metatada_update = create_ome_zarr_md(
     input_paths=input_paths,
-    output_path=output_path,
+    output_path=str(zarr_root),
     metadata={},
     zarr_name=output_name,
     mode=mode,
@@ -29,10 +42,11 @@ metatada_update = create_ome_zarr_md(
     overwrite=overwrite,
 )
 
-for component in metatada_update["image"]:
-    md_to_ome_zarr(
-        input_paths=[output_path],
-        output_path=output_path,
-        component=component,
-        metadata=metatada_update,
-    )
+# for component in metatada_update["image"]:
+#     md_to_ome_zarr(
+#         input_paths=[str(zarr_root)],
+#         output_path=str(zarr_root),
+#         component=component,
+#         metadata=metatada_update,
+#         memory_efficient=memory_efficient,
+#     )

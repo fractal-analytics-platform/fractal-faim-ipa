@@ -34,10 +34,10 @@ classifiers = [
 ]
 
 dependencies = [
-    "fractal-tasks-core==0.11.0",
+    "fractal-tasks-core==0.14.1",
     "pydantic",
     "zarr",
-    "faim-hcs @ git+https://github.com/jluethi/faim-hcs.git@generalized_wavelength_extraction",
+    "faim-hcs @ git+https://github.com/fmi-faim/faim-hcs.git@f94232ade99688cd991a97b5173e77c6f5d2d3f1",
 ]
 
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
