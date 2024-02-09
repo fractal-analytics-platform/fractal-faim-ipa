@@ -1,6 +1,6 @@
 # Fractal example scripts
 
-from fractal_faim_hcs.create_ome_zarr_md import create_ome_zarr_md
+from fractal_faim_hcs.md_create_ome_zarr import md_create_ome_zarr
 
 # from fractal_faim_hcs.md_to_ome_zarr import md_to_ome_zarr
 
@@ -31,7 +31,7 @@ overwrite = True
 
 output_name = "OME-Zarr-Test"
 
-metatada_update = create_ome_zarr_md(
+metatada_update = md_create_ome_zarr(
     input_paths=input_paths,
     output_path=str(zarr_root),
     metadata={},
