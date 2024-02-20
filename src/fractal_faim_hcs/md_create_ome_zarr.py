@@ -2,6 +2,7 @@
 import logging
 import shutil
 from collections.abc import Sequence
+from enum import Enum
 from os.path import exists, join
 from typing import Any
 
@@ -11,9 +12,19 @@ from faim_hcs.hcs.converter import ConvertToNGFFPlate, NGFFPlate
 from faim_hcs.hcs.imagexpress import StackAcquisition
 from faim_hcs.hcs.plate import PlateLayout
 from faim_hcs.stitching import stitching_utils
+from fractal_tasks_core.tables import write_table
 from pydantic.decorator import validate_arguments
 
+from fractal_faim_hcs.roi_tables import create_ROI_tables
+
 logger = logging.getLogger(__name__)
+
+
+class ModeEnum(Enum):
+    """Handle selection of conversion mode."""
+
+    StackAcquisition = "MD Stack Acquisition"
+    SinglePlaneAcquisition = "MD Single Plane Acquisition"
 
 
 @validate_arguments
@@ -23,7 +34,7 @@ def md_create_ome_zarr(
     output_path: str,
     metadata: dict[str, Any],
     zarr_name: str = "Plate",
-    mode: str = "all",
+    mode: ModeEnum = "MD Stack Acquisition",
     # TODO: Verify whether this works for building the manifest
     layout: PlateLayout = 96,
     # query: str = "",  # FIXME: Is filtering still possible?
@@ -76,10 +87,11 @@ def md_create_ome_zarr(
 
     # Parse MD plate acquisition.
     # FIXME: Handle different acquisition modes
-    plate_acquisition = StackAcquisition(
-        acquisition_dir=input_paths[0],
-        alignment=TileAlignmentOptions.GRID,
-    )
+    if mode == ModeEnum.StackAcquisition:
+        plate_acquisition = StackAcquisition(
+            acquisition_dir=input_paths[0],
+            alignment=TileAlignmentOptions.GRID,
+        )
 
     # TO REVIEW: Check if we want to handle the dask client differently?
     # Is there good auto-detection? Any potential issues with memory handling?
@@ -123,9 +135,16 @@ def md_create_ome_zarr(
     plate_name = zarr_name + ".zarr"
     well_paths = []
     image_paths = []
-    # TODO: Find a better way than using the internal _wells
-    for well in plate_acquisition._wells:
-        well_rc = well.get_row_col()
+
+    # Write ROI tables to the images
+    # Remove hard-coded well sub group? Or make flexible for multiplexing
+    well_sub_group = "0"
+
+    well_acquisitions = plate_acquisition.get_well_acquisitions(selection=None)
+    roi_tables = create_ROI_tables(plate_acquistion=plate_acquisition)
+
+    for well_acquisition in well_acquisitions:
+        well_rc = well_acquisition.get_row_col()
         well_path = f"{plate_name}/{well_rc[0]}/{well_rc[1]}"
         well_paths.append(well_path)
 
@@ -133,6 +152,19 @@ def md_create_ome_zarr(
         # (multiple well subgroups)
         image_path = f"{well_path}/{well_sub_group}"
         image_paths.append(image_path)
+
+        # Write the tables
+        image_group = plate[well_rc[0]][well_rc[1]][well_sub_group]
+        tables = roi_tables[well_acquisition.name].keys()
+        for table_name in tables:
+            write_table(
+                image_group=image_group,
+                table_name=table_name,
+                table=roi_tables[well_acquisition.name][table_name],
+                overwrite=overwrite,
+                table_type="roi_table",
+                table_attrs=None,
+            )
 
     metadata_update = {
         "plate": [plate_name],

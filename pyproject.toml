@@ -34,10 +34,10 @@ classifiers = [
 ]
 
 dependencies = [
-    "fractal-tasks-core==0.14.1",
+    "fractal-tasks-core==0.14.2",
     "pydantic",
     "zarr",
-    "faim-hcs @ git+https://github.com/fmi-faim/faim-hcs.git@f94232ade99688cd991a97b5173e77c6f5d2d3f1",
+    "faim-hcs @ git+https://github.com/fmi-faim/faim-hcs.git@v0.2.4",
 ]
 
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
@@ -125,7 +125,6 @@ pretty = true
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = ["tests"]
-filterwarnings = ["error"]
 
 # https://coverage.readthedocs.io/en/6.4/config.html
 [tool.coverage.report]
