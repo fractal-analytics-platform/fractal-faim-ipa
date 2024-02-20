@@ -74,6 +74,8 @@ def md_create_ome_zarr(
             "MD Create OME-Zarr task is not implemented to handle multiple "
             "input paths"
         )
+    mode = ModeEnum(mode)
+    layout = PlateLayout(layout)
 
     # TO REVIEW: Overwrite checks are not exposed in faim-hcs API
     # Unclear how faim-hcs handles rerunning the plate creation

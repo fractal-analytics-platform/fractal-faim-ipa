@@ -10,9 +10,8 @@ from faim_hcs.Zarr import (
     write_czyx_image_to_well,
     write_roi_table,
 )
-from pydantic.decorator import validate_arguments
-
 from fractal_faim_hcs.parse_zmb import parse_files_zmb
+from pydantic.decorator import validate_arguments
 
 logger = logging.getLogger(__name__)
 
