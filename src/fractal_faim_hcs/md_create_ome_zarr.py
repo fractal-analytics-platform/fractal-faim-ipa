@@ -34,9 +34,12 @@ def md_create_ome_zarr(
     output_path: str,
     metadata: dict[str, Any],
     zarr_name: str = "Plate",
-    mode: ModeEnum = "MD Stack Acquisition",
-    # TODO: Verify whether this works for building the manifest
-    layout: PlateLayout = 96,
+    # mode: ModeEnum = "MD Stack Acquisition",
+    # # TODO: Verify whether this works for building the manifest
+    # layout: PlateLayout = 96,
+    mode: str = "MD Stack Acquisition",
+    # # TODO: Verify whether this works for building the manifest
+    layout: int = 96,
     # query: str = "",  # FIXME: Is filtering still possible?
     order_name: str = "example-order",
     barcode: str = "example-barcode",
@@ -54,11 +57,8 @@ def md_create_ome_zarr(
         output_path: Path to the output file (Fractal managed)
         metadata: Metadata dictionary (Fractal managed)
         zarr_name: Name of the zarr plate file that will be created
-        mode: Mode can be 4 values: "z-steps" (only parse the 3D data),
-                 "top-level" (only parse the 2D data), "all" (parse both),
-                 "zmb" (zmb-parser, detect mode automatically)
+        mode: TBD
         layout: Plate layout for the Zarr file. Valid options are 96 and 384
-        query: Pandas query to filter intput-filenames
         order_name: Name of the order
         barcode: Barcode of the plate
         overwrite: Whether to overwrite the zarr file if it already exists
