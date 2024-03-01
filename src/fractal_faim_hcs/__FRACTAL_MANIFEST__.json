@@ -36,7 +36,7 @@
             "title": "Mode",
             "default": "MD Stack Acquisition",
             "type": "string",
-            "description": "TBD"
+            "description": "Choose \"MD Stack Acquisition\" for 3D datasets, \"SinglePlaneAcquisition\" for 2D datasets or \"MixedAcquisition\" for combined acquisitions. [TBD selection improvements]"
           },
           "layout": {
             "title": "Layout",
