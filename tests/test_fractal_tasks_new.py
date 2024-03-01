@@ -111,5 +111,5 @@ def test_ome_zarr_conversion():
     ]
     assert all(
         math.isclose(a, b, rel_tol=1e-5)
-        for a, b in zip(df_fov.loc["FOV_35"].values.flatten().tolist(), target_values)
+        for a, b in zip(df_fov.loc["FOV_2"].values.flatten().tolist(), target_values)
     )

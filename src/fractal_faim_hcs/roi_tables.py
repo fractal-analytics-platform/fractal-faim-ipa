@@ -71,7 +71,8 @@ def create_fov_ROI_table(
     tile = tiles[0]
     min_z = tile.position.z * pixel_size_zyx[0]
     max_z = (tile.position.z + 1) * pixel_size_zyx[0]
-    for i, tile in enumerate(tiles):
+    fov_counter = 1
+    for tile in tiles:
         z_start = tile.position.z * pixel_size_zyx[0]
         z_end = (tile.position.z + 1) * pixel_size_zyx[0]
         if z_start < min_z:
@@ -83,7 +84,7 @@ def create_fov_ROI_table(
         if tile.position.z == 0 and tile.position.channel == 0:
             fov_rois.append(
                 (
-                    f"FOV_{i+1}",
+                    f"FOV_{fov_counter}",
                     tile.position.x * pixel_size_zyx[2],
                     tile.position.y * pixel_size_zyx[1],
                     tile.position.z * pixel_size_zyx[0],
@@ -92,6 +93,7 @@ def create_fov_ROI_table(
                     (tile.position.z + 1) * pixel_size_zyx[0],
                 )
             )
+            fov_counter += 1
     roi_table = pd.DataFrame(fov_rois, columns=columns).set_index("FieldIndex")
 
     roi_table["z_micrometer"] = min_z
