@@ -77,12 +77,12 @@
         "additionalProperties": false
       },
       "executable": "md_create_ome_zarr.py",
-      "input_type": "zarr",
+      "input_type": "image",
       "meta": {
-        "cpus_per_task": 2,
-        "mem": 8000
+        "cpus_per_task": 4,
+        "mem": 16000
       },
-      "name": "Convert Yokogawa to OME-Zarr",
+      "name": "MD Convert OME-Zarr",
       "output_type": "zarr",
       "docs_info": "Create OME-Zarr plate from MD Image Xpress files.\n\nThis is a non-parallel task => it parses the metadata, creates the plates\nand then converts all the wells in the same process",
       "docs_link": "https://github.com/jluethi/fractal-faim-hcs"

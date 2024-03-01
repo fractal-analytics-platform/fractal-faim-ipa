@@ -9,7 +9,11 @@ from typing import Any
 import distributed
 from faim_hcs.hcs.acquisition import TileAlignmentOptions
 from faim_hcs.hcs.converter import ConvertToNGFFPlate, NGFFPlate
-from faim_hcs.hcs.imagexpress import StackAcquisition
+from faim_hcs.hcs.imagexpress import (
+    MixedAcquisition,
+    SinglePlaneAcquisition,
+    StackAcquisition,
+)
 from faim_hcs.hcs.plate import PlateLayout
 from faim_hcs.stitching import stitching_utils
 from fractal_tasks_core.tables import write_table
@@ -25,6 +29,7 @@ class ModeEnum(Enum):
 
     StackAcquisition = "MD Stack Acquisition"
     SinglePlaneAcquisition = "MD Single Plane Acquisition"
+    MixedAcquisition = "MixedAcquisition"
 
 
 @validate_arguments
@@ -57,7 +62,9 @@ def md_create_ome_zarr(
         output_path: Path to the output file (Fractal managed)
         metadata: Metadata dictionary (Fractal managed)
         zarr_name: Name of the zarr plate file that will be created
-        mode: TBD
+        mode: Choose "MD Stack Acquisition" for 3D datasets,
+            "SinglePlaneAcquisition" for 2D datasets or "MixedAcquisition"
+            for combined acquisitions. [TBD selection improvements]
         layout: Plate layout for the Zarr file. Valid options are 96 and 384
         order_name: Name of the order
         barcode: Barcode of the plate
@@ -77,6 +84,8 @@ def md_create_ome_zarr(
     mode = ModeEnum(mode)
     layout = PlateLayout(layout)
 
+    # TODO: Expose non-grid stitching
+
     # TO REVIEW: Overwrite checks are not exposed in faim-hcs API
     # Unclear how faim-hcs handles rerunning the plate creation
     # (the Zarr file gets a newer timestamp at least)
@@ -94,6 +103,18 @@ def md_create_ome_zarr(
             acquisition_dir=input_paths[0],
             alignment=TileAlignmentOptions.GRID,
         )
+    elif mode == ModeEnum.SinglePlaneAcquisition:
+        plate_acquisition = SinglePlaneAcquisition(
+            acquisition_dir=input_paths[0],
+            alignment=TileAlignmentOptions.GRID,
+        )
+    elif mode == ModeEnum.MixedAcquisition:
+        plate_acquisition = MixedAcquisition(
+            acquisition_dir=input_paths[0],
+            alignment=TileAlignmentOptions.GRID,
+        )
+    else:
+        raise NotImplementedError(f"MD Converter was not implemented for {mode=}")
 
     # TO REVIEW: Check if we want to handle the dask client differently?
     client = distributed.Client(
