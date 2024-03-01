@@ -96,10 +96,9 @@ def md_create_ome_zarr(
         )
 
     # TO REVIEW: Check if we want to handle the dask client differently?
-    # Is there good auto-detection? Any potential issues with memory handling?
     client = distributed.Client(
-        n_workers=1,
-        threads_per_worker=1,
+        # n_workers=1,
+        # threads_per_worker=1,
         processes=False,
     )
 
