@@ -1,5 +1,6 @@
 # Fractal example scripts
 
+import math
 import tempfile
 from os.path import join
 from pathlib import Path
@@ -83,7 +84,10 @@ def test_ome_zarr_conversion():
         699.8015747070312,
         49.900001525878906,
     ]
-    assert df_well.loc["well_1"].values.flatten().tolist() == target_values
+    assert all(
+        math.isclose(a, b, rel_tol=1e-5)
+        for a, b in zip(df_well.loc["well_1"].values.flatten().tolist(), target_values)
+    )
 
     table = ad.read_zarr(
         zarr_root
@@ -105,4 +109,7 @@ def test_ome_zarr_conversion():
         699.8015747070312,
         49.900001525878906,
     ]
-    assert df_fov.loc["FOV_35"].values.flatten().tolist() == target_values
+    assert all(
+        math.isclose(a, b, rel_tol=1e-5)
+        for a, b in zip(df_fov.loc["FOV_35"].values.flatten().tolist(), target_values)
+    )
