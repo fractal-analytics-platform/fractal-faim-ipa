@@ -99,7 +99,7 @@ def md_create_ome_zarr(
     client = distributed.Client(
         # n_workers=1,
         # threads_per_worker=1,
-        processes=False,
+        # processes=False,
     )
 
     converter = ConvertToNGFFPlate(
