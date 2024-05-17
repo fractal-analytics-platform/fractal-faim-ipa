@@ -5,7 +5,7 @@ from fractal_faim_hcs.md_create_ome_zarr import md_create_ome_zarr
 # from fractal_faim_hcs.md_to_ome_zarr import md_to_ome_zarr
 
 
-input_paths = ["../resources/Projection-Mix"]
+image_dir = "../resources/Projection-Mix"
 # input_paths = [
 #     "/Users/joel/Library/CloudStorage/Dropbox/Joel/BioVisionCenter"
 #     "/Code/fractal/fractal-faim-hcs/resources/Projection-Mix"
@@ -27,8 +27,6 @@ overwrite = True
 # mode = "top-level"
 mode = "all"
 
-memory_efficient = False
-
 mode = "MD Stack Acquisition"
 
 order_name = "example-order"
@@ -38,12 +36,13 @@ overwrite = True
 output_name = "OME-Zarr-Test"
 
 # metatada_update
-plate = md_create_ome_zarr(
-    input_paths=input_paths,
-    output_path=str(zarr_root),
-    metadata={},
+md_create_ome_zarr(
+    zarr_urls=[],
+    zarr_dir=str(zarr_root),
+    image_dir=image_dir,
     zarr_name=output_name,
     mode=mode,
+    layout=96,
     order_name=order_name,
     barcode=barcode,
     overwrite=overwrite,

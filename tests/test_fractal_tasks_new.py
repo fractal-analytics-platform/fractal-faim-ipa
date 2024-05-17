@@ -11,7 +11,7 @@ from fractal_faim_hcs.md_create_ome_zarr import md_create_ome_zarr
 
 def test_ome_zarr_conversion():
     ROOT_DIR = Path(__file__).parent
-    input_paths = [str(join(ROOT_DIR.parent, "resources", "Projection-Mix"))]
+    image_dir = str(join(ROOT_DIR.parent, "resources", "Projection-Mix"))
     tmp_dir = tempfile.mkdtemp()
     zarr_root = Path(tmp_dir, "zarr-files")
     zarr_root.mkdir()
@@ -25,9 +25,9 @@ def test_ome_zarr_conversion():
     output_name = "OME-Zarr"
 
     md_create_ome_zarr(
-        input_paths=input_paths,
-        output_path=str(zarr_root),
-        metadata={},
+        zarr_urls=[],
+        zarr_dir=str(zarr_root),
+        image_dir=image_dir,
         zarr_name=output_name,
         mode=mode,
         layout=96,
@@ -82,7 +82,7 @@ def test_ome_zarr_conversion():
         0.0,
         1399.6031494140625,
         699.8015747070312,
-        49.900001525878906,
+        50.0,
     ]
     assert all(
         math.isclose(a, b, rel_tol=1e-5)
@@ -107,7 +107,7 @@ def test_ome_zarr_conversion():
         0.0,
         699.8015747070312,
         699.8015747070312,
-        49.900001525878906,
+        50.0,
     ]
     assert all(
         math.isclose(a, b, rel_tol=1e-5)

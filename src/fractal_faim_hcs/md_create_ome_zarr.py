@@ -1,21 +1,20 @@
 # OME-Zarr creation from MD Image Express
 import logging
 import shutil
-from collections.abc import Sequence
 from enum import Enum
 from os.path import exists, join
 from typing import Any
 
 import distributed
-from faim_hcs.hcs.acquisition import TileAlignmentOptions
-from faim_hcs.hcs.converter import ConvertToNGFFPlate, NGFFPlate
-from faim_hcs.hcs.imagexpress import (
+from faim_ipa.hcs.acquisition import TileAlignmentOptions
+from faim_ipa.hcs.converter import ConvertToNGFFPlate, NGFFPlate
+from faim_ipa.hcs.imagexpress import (
     MixedAcquisition,
     SinglePlaneAcquisition,
     StackAcquisition,
 )
-from faim_hcs.hcs.plate import PlateLayout
-from faim_hcs.stitching import stitching_utils
+from faim_ipa.hcs.plate import PlateLayout
+from faim_ipa.stitching import stitching_utils
 from fractal_tasks_core.tables import write_table
 from pydantic.decorator import validate_arguments
 
@@ -35,14 +34,15 @@ class ModeEnum(Enum):
 @validate_arguments
 def md_create_ome_zarr(
     *,
-    input_paths: Sequence[str],
-    output_path: str,
-    metadata: dict[str, Any],
+    zarr_urls: list[str],
+    zarr_dir: str,
+    image_dir: str,
     zarr_name: str = "Plate",
     # mode: ModeEnum = "MD Stack Acquisition",
     # # TODO: Verify whether this works for building the manifest
     # layout: PlateLayout = 96,
-    mode: str = "MD Stack Acquisition",
+    # mode: Literal[tuple(ModeEnum.value)] = "MD Stack Acquisition",
+    mode: ModeEnum = "MD Stack Acquisition",
     # # TODO: Verify whether this works for building the manifest
     layout: int = 96,
     # query: str = "",  # FIXME: Is filtering still possible?
@@ -58,9 +58,13 @@ def md_create_ome_zarr(
     and then converts all the wells in the same process
 
     Args:
-        input_paths: List of paths to the input files (Fractal managed)
-        output_path: Path to the output file (Fractal managed)
-        metadata: Metadata dictionary (Fractal managed)
+        zarr_urls: List of paths or urls to the individual OME-Zarr image to
+            be processed. Not used by the converter task.
+            (standard argument for Fractal tasks, managed by Fractal server).
+        zarr_dir: path of the directory where the new OME-Zarrs will be
+            created.
+            (standard argument for Fractal tasks, managed by Fractal server).
+        image_dir: Path to the folder containing the images to be converted.
         zarr_name: Name of the zarr plate file that will be created
         mode: Choose "MD Stack Acquisition" for 3D datasets,
             "SinglePlaneAcquisition" for 2D datasets or "MixedAcquisition"
@@ -76,11 +80,6 @@ def md_create_ome_zarr(
     Returns:
         Metadata dictionary
     """
-    if len(input_paths) > 1:
-        raise NotImplementedError(
-            "MD Create OME-Zarr task is not implemented to handle multiple "
-            "input paths"
-        )
     mode = ModeEnum(mode)
     layout = PlateLayout(layout)
 
@@ -90,50 +89,50 @@ def md_create_ome_zarr(
     # Unclear how faim-hcs handles rerunning the plate creation
     # (the Zarr file gets a newer timestamp at least)
     # This block triggers a reset
-    if overwrite and exists(join(output_path, zarr_name + ".zarr")):
+    if overwrite and exists(join(zarr_dir, zarr_name + ".zarr")):
         # Remove zarr if it already exists.
-        shutil.rmtree(join(output_path, zarr_name + ".zarr"))
+        shutil.rmtree(join(zarr_dir, zarr_name + ".zarr"))
 
     # TO REVIEW: Any options for using queries / subset filters in new mode?
 
     # Parse MD plate acquisition.
-    # FIXME: Handle different acquisition modes
+    # TODO: Handle different acquisition modes
     if mode == ModeEnum.StackAcquisition:
         plate_acquisition = StackAcquisition(
-            acquisition_dir=input_paths[0],
+            acquisition_dir=image_dir,
             alignment=TileAlignmentOptions.GRID,
         )
     elif mode == ModeEnum.SinglePlaneAcquisition:
         plate_acquisition = SinglePlaneAcquisition(
-            acquisition_dir=input_paths[0],
+            acquisition_dir=image_dir,
             alignment=TileAlignmentOptions.GRID,
         )
     elif mode == ModeEnum.MixedAcquisition:
         plate_acquisition = MixedAcquisition(
-            acquisition_dir=input_paths[0],
+            acquisition_dir=image_dir,
             alignment=TileAlignmentOptions.GRID,
         )
     else:
         raise NotImplementedError(f"MD Converter was not implemented for {mode=}")
 
     # TO REVIEW: Check if we want to handle the dask client differently?
+    # For local testing, a client with the commented settings works. On
+    # deployment, those settings aren't necessary.
     client = distributed.Client(
-        # n_workers=1,
-        # threads_per_worker=1,
-        # processes=False,
+        n_workers=1,
+        threads_per_worker=1,
+        processes=False,
     )
 
     converter = ConvertToNGFFPlate(
         ngff_plate=NGFFPlate(
-            root_dir=output_path,
+            root_dir=zarr_dir,
             name=zarr_name,
             layout=int(layout),
             order_name=order_name,
             barcode=barcode,
         ),
         yx_binning=coarsening_xy,
-        # TO REVIEW: Unsure what stitching_yx_chunk_size_factor really does
-        stitching_yx_chunk_size_factor=coarsening_xy,
         warp_func=stitching_utils.translate_tiles_2d,
         fuse_func=stitching_utils.fuse_mean,
         client=client,
@@ -166,6 +165,7 @@ def md_create_ome_zarr(
     roi_tables = create_ROI_tables(plate_acquistion=plate_acquisition)
 
     for well_acquisition in well_acquisitions:
+        print(well_acquisition)
         well_rc = well_acquisition.get_row_col()
         well_path = f"{plate_name}/{well_rc[0]}/{well_rc[1]}"
         well_paths.append(well_path)
@@ -188,13 +188,14 @@ def md_create_ome_zarr(
                 table_attrs=None,
             )
 
-    metadata_update = {
-        "plate": [plate_name],
-        "well": well_paths,
-        "image": image_paths,
-    }
+    # TODO: Build image list update
+    # metadata_update = {
+    #     "plate": [plate_name],
+    #     "well": well_paths,
+    #     "image": image_paths,
+    # }
 
-    return metadata_update
+    # return metadata_update
 
 
 if __name__ == "__main__":
