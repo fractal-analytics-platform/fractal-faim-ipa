@@ -25,17 +25,17 @@ def parse_files_zmb(path, query=None):
         )
     )
 
-    if not query=="":
+    if not query == "":
         files = files.query(query).copy()
 
     # mode detection
-    if files['z'].isnull().all():
-        mode = 'top-level'
-    elif '0' in list(files['z']):
-        mode = 'all'
-        files.loc[files['z']=='0', 'z'] = None
+    if files["z"].isnull().all():
+        mode = "top-level"
+    elif "0" in list(files["z"]):
+        mode = "all"
+        files.loc[files["z"] == "0", "z"] = None
     else:
-        mode = 'z-steps'
+        mode = "z-steps"
 
     # Ensure that field and channel are not None
     if files["field"].isnull().all():

@@ -1,6 +1,6 @@
 """Fractal Task list for Fractal Helper Tasks."""
 
-from fractal_tasks_core.dev.task_models import NonParallelTask, ParallelTask
+from fractal_tasks_core.dev.task_models import NonParallelTask
 
 TASK_LIST = [
     NonParallelTask(
