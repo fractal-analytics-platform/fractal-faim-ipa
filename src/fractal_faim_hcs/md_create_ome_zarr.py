@@ -1,34 +1,21 @@
 # OME-Zarr creation from MD Image Express
 import logging
 import shutil
-from enum import Enum
 from os.path import exists, join
 from typing import Any
 
 import distributed
 from faim_ipa.hcs.acquisition import TileAlignmentOptions
 from faim_ipa.hcs.converter import ConvertToNGFFPlate, NGFFPlate
-from faim_ipa.hcs.imagexpress import (
-    MixedAcquisition,
-    SinglePlaneAcquisition,
-    StackAcquisition,
-)
 from faim_ipa.hcs.plate import PlateLayout
 from faim_ipa.stitching import stitching_utils
 from fractal_tasks_core.tables import write_table
 from pydantic.decorator import validate_arguments
 
+from fractal_faim_hcs.md_converter_utils import ModeEnum
 from fractal_faim_hcs.roi_tables import create_ROI_tables
 
 logger = logging.getLogger(__name__)
-
-
-class ModeEnum(Enum):
-    """Handle selection of conversion mode."""
-
-    StackAcquisition = "MD Stack Acquisition"
-    SinglePlaneAcquisition = "MD Single Plane Acquisition"
-    MixedAcquisition = "MixedAcquisition"
 
 
 @validate_arguments
@@ -40,16 +27,17 @@ def md_create_ome_zarr(
     zarr_name: str = "Plate",
     # mode: ModeEnum = "MD Stack Acquisition",
     # # TODO: Verify whether this works for building the manifest
-    # layout: PlateLayout = 96,
+    layout: PlateLayout = 96,
     # mode: Literal[tuple(ModeEnum.value)] = "MD Stack Acquisition",
     mode: ModeEnum = "MD Stack Acquisition",
     # # TODO: Verify whether this works for building the manifest
-    layout: int = 96,
+    # layout: int = 96,
     # query: str = "",  # FIXME: Is filtering still possible?
     order_name: str = "example-order",
     barcode: str = "example-barcode",
     overwrite: bool = True,  # FIXME: Are overwrite checks still possible?
     coarsening_xy: int = 2,  # TODO: Only add to second task?
+    parallelize: bool = True,
 ) -> dict[str, Any]:
     """
     Create OME-Zarr plate from MD Image Xpress files.
@@ -76,14 +64,16 @@ def md_create_ome_zarr(
         coarsening_xy: Linear coarsening factor between subsequent levels.
             If set to `2`, level 1 is 2x downsampled, level 2 is
             4x downsampled etc.
+        parallelize: The automatic distribute.Client option often fails to
+            finish when running the task locally. Set parallelize to false to
+            avoid that.
 
     Returns:
         Metadata dictionary
     """
-    mode = ModeEnum(mode)
-    layout = PlateLayout(layout)
-
-    # TODO: Expose non-grid stitching
+    # mode = ModeEnum(mode)
+    # layout = PlateLayout(layout)
+    zarr_dir = zarr_dir.rstrip("/")
 
     # TO REVIEW: Overwrite checks are not exposed in faim-hcs API
     # Unclear how faim-hcs handles rerunning the plate creation
@@ -95,34 +85,22 @@ def md_create_ome_zarr(
 
     # TO REVIEW: Any options for using queries / subset filters in new mode?
 
-    # Parse MD plate acquisition.
-    # TODO: Handle different acquisition modes
-    if mode == ModeEnum.StackAcquisition:
-        plate_acquisition = StackAcquisition(
-            acquisition_dir=image_dir,
-            alignment=TileAlignmentOptions.GRID,
-        )
-    elif mode == ModeEnum.SinglePlaneAcquisition:
-        plate_acquisition = SinglePlaneAcquisition(
-            acquisition_dir=image_dir,
-            alignment=TileAlignmentOptions.GRID,
-        )
-    elif mode == ModeEnum.MixedAcquisition:
-        plate_acquisition = MixedAcquisition(
-            acquisition_dir=image_dir,
-            alignment=TileAlignmentOptions.GRID,
-        )
-    else:
-        raise NotImplementedError(f"MD Converter was not implemented for {mode=}")
-
-    # TO REVIEW: Check if we want to handle the dask client differently?
-    # For local testing, a client with the commented settings works. On
-    # deployment, those settings aren't necessary.
-    client = distributed.Client(
-        n_workers=1,
-        threads_per_worker=1,
-        processes=False,
+    # TODO: Expose non-grid stitching
+    plate_acquisition = ModeEnum(mode).get_plate_acquisition(
+        acquisition_dir=image_dir,
+        alignment=TileAlignmentOptions.GRID,
     )
+
+    # The automatic distribute.Client option often fails to finish when
+    # running the task locally. Set parallelize to false to avoid that.
+    if parallelize:
+        client = distributed.Client()
+    else:
+        client = distributed.Client(
+            n_workers=1,
+            threads_per_worker=1,
+            processes=False,
+        )
 
     converter = ConvertToNGFFPlate(
         ngff_plate=NGFFPlate(
@@ -142,6 +120,15 @@ def md_create_ome_zarr(
 
     # TODO: Remove hard-coded well sub group? Or make flexible for multiplexing
     well_sub_group = "0"
+    well_acquisitions = plate_acquisition.get_well_acquisitions(selection=None)
+
+    plate_name = zarr_name + ".zarr"
+
+    image_list_updates = []
+    if mode == ModeEnum.SinglePlaneAcquisition:
+        is_3D = False
+    else:
+        is_3D = True
 
     # Run conversion.
     converter.run(
@@ -152,30 +139,11 @@ def md_create_ome_zarr(
         # max_layer=2, # check whether that should be exposed
     )
 
-    # Create the metadata dictionary: needs a list of all the images
-    plate_name = zarr_name + ".zarr"
-    well_paths = []
-    image_paths = []
-
     # Write ROI tables to the images
-    # Remove hard-coded well sub group? Or make flexible for multiplexing
-    well_sub_group = "0"
-
-    well_acquisitions = plate_acquisition.get_well_acquisitions(selection=None)
     roi_tables = create_ROI_tables(plate_acquistion=plate_acquisition)
-
     for well_acquisition in well_acquisitions:
-        print(well_acquisition)
-        well_rc = well_acquisition.get_row_col()
-        well_path = f"{plate_name}/{well_rc[0]}/{well_rc[1]}"
-        well_paths.append(well_path)
-
-        # To add multiplexing, need to add a bigger image list here
-        # (multiple well subgroups)
-        image_path = f"{well_path}/{well_sub_group}"
-        image_paths.append(image_path)
-
         # Write the tables
+        well_rc = well_acquisition.get_row_col()
         image_group = plate[well_rc[0]][well_rc[1]][well_sub_group]
         tables = roi_tables[well_acquisition.name].keys()
         for table_name in tables:
@@ -188,14 +156,21 @@ def md_create_ome_zarr(
                 table_attrs=None,
             )
 
-    # TODO: Build image list update
-    # metadata_update = {
-    #     "plate": [plate_name],
-    #     "well": well_paths,
-    #     "image": image_paths,
-    # }
+        # Create the metadata dictionary: needs a list of all the images
+        well_id = f"{well_rc[0]}{well_rc[1]}"
+        zarr_url = f"{zarr_dir}/{plate_name}/{well_rc[0]}/{well_rc[1]}/{well_sub_group}"
+        image_list_updates.append(
+            {
+                "zarr_url": zarr_url,
+                "attributes": {
+                    "plate": plate_name,
+                    "well": well_id,
+                },
+                "types": {"is_3D": is_3D},
+            }
+        )
 
-    # return metadata_update
+    return {"image_list_updates": image_list_updates}
 
 
 if __name__ == "__main__":

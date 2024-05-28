@@ -46,13 +46,5 @@ md_create_ome_zarr(
     order_name=order_name,
     barcode=barcode,
     overwrite=overwrite,
+    parallelize=False,
 )
-
-# for component in metatada_update["image"]:
-#     md_to_ome_zarr(
-#         input_paths=[str(zarr_root)],
-#         output_path=str(zarr_root),
-#         component=component,
-#         metadata=metatada_update,
-#         memory_efficient=memory_efficient,
-#     )
