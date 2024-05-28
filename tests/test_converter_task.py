@@ -6,7 +6,7 @@ from os.path import join
 from pathlib import Path
 
 import anndata as ad
-from fractal_faim_hcs.md_create_ome_zarr import md_create_ome_zarr
+from fractal_faim_ipa.md_create_ome_zarr import md_create_ome_zarr
 
 
 def test_ome_zarr_conversion():
