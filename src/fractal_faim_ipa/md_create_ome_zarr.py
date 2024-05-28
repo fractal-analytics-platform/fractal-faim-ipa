@@ -9,8 +9,8 @@ from faim_ipa.hcs.acquisition import TileAlignmentOptions
 from faim_ipa.hcs.converter import ConvertToNGFFPlate, NGFFPlate
 from faim_ipa.hcs.plate import PlateLayout
 from faim_ipa.stitching import stitching_utils
-from fractal_faim_hcs.md_converter_utils import ModeEnum
-from fractal_faim_hcs.roi_tables import create_ROI_tables
+from fractal_faim_ipa.md_converter_utils import ModeEnum
+from fractal_faim_ipa.roi_tables import create_ROI_tables
 from fractal_tasks_core.tables import write_table
 from pydantic.decorator import validate_arguments
 

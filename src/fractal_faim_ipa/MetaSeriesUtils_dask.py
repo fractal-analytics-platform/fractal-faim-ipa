@@ -5,13 +5,13 @@ from typing import Callable
 import dask.array as da
 import numpy as np
 import pandas as pd
-from faim_hcs.MetaSeriesUtils import (
+from faim_ipa.MetaSeriesUtils import (
     _build_ch_metadata,
     compute_z_sampling,
     get_img_YX,
     montage_grid_image_YX,
 )
-from faim_hcs.UIntHistogram import UIntHistogram
+from faim_ipa.UIntHistogram import UIntHistogram
 from numpy._typing import ArrayLike
 from tifffile import tifffile
 
