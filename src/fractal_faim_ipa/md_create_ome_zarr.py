@@ -2,17 +2,17 @@
 import logging
 import shutil
 from os.path import exists, join
-from typing import Any
+from typing import Any, Literal
 
 import distributed
 from faim_ipa.hcs.acquisition import TileAlignmentOptions
 from faim_ipa.hcs.converter import ConvertToNGFFPlate, NGFFPlate
-from faim_ipa.hcs.plate import PlateLayout
 from faim_ipa.stitching import stitching_utils
-from fractal_faim_ipa.md_converter_utils import ModeEnum
-from fractal_faim_ipa.roi_tables import create_ROI_tables
 from fractal_tasks_core.tables import write_table
 from pydantic.decorator import validate_arguments
+
+from fractal_faim_ipa.md_converter_utils import ModeEnum
+from fractal_faim_ipa.roi_tables import create_ROI_tables
 
 logger = logging.getLogger(__name__)
 
@@ -25,10 +25,13 @@ def md_create_ome_zarr(
     image_dir: str,
     zarr_name: str = "Plate",
     # mode: ModeEnum = "MD Stack Acquisition",
-    # # TODO: Verify whether this works for building the manifest
-    layout: PlateLayout = 96,
-    # mode: Literal[tuple(ModeEnum.value)] = "MD Stack Acquisition",
-    mode: ModeEnum = "MD Stack Acquisition",
+    # # TODO: Figure out a way to use the Enums directly with working manifest building
+    # layout: PlateLayout = 96,
+    # mode: ModeEnum = "MD Stack Acquisition",
+    layout: Literal[96, 384] = 96,
+    mode: Literal[
+        "MD Stack Acquisition", "MD Single Plane Acquisition", "MixedAcquisition"
+    ] = "MD Stack Acquisition",
     # # TODO: Verify whether this works for building the manifest
     # layout: int = 96,
     # query: str = "",  # FIXME: Is filtering still possible?

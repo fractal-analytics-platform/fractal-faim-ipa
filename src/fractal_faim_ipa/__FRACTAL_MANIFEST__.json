@@ -1,30 +1,34 @@
 {
-  "args_schema_version": "pydantic_v1",
-  "has_args_schemas": true,
-  "manifest_version": 1,
+  "manifest_version": "2",
   "task_list": [
     {
-      "args_schema": {
+      "name": "FAIM-IPA Convert MD to OME-Zarr",
+      "executable_non_parallel": "md_create_ome_zarr.py",
+      "meta_non_parallel": {
+        "cpus_per_task": 8,
+        "mem": 32000
+      },
+      "args_schema_non_parallel": {
         "title": "MdCreateOmeZarr",
         "type": "object",
         "properties": {
-          "input_paths": {
-            "title": "Input Paths",
+          "zarr_urls": {
+            "title": "Zarr Urls",
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "List of paths to the input files (Fractal managed)"
+            "description": "List of paths or urls to the individual OME-Zarr image to be processed. Not used by the converter task. (standard argument for Fractal tasks, managed by Fractal server)."
           },
-          "output_path": {
-            "title": "Output Path",
+          "zarr_dir": {
+            "title": "Zarr Dir",
             "type": "string",
-            "description": "Path to the output file (Fractal managed)"
+            "description": "path of the directory where the new OME-Zarrs will be created. (standard argument for Fractal tasks, managed by Fractal server)."
           },
-          "metadata": {
-            "title": "Metadata",
-            "type": "object",
-            "description": "Metadata dictionary (Fractal managed)"
+          "image_dir": {
+            "title": "Image Dir",
+            "type": "string",
+            "description": "Path to the folder containing the images to be converted."
           },
           "zarr_name": {
             "title": "Zarr Name",
@@ -32,17 +36,26 @@
             "type": "string",
             "description": "Name of the zarr plate file that will be created"
           },
-          "mode": {
-            "title": "Mode",
-            "default": "MD Stack Acquisition",
-            "type": "string",
-            "description": "Choose \"MD Stack Acquisition\" for 3D datasets, \"SinglePlaneAcquisition\" for 2D datasets or \"MixedAcquisition\" for combined acquisitions. [TBD selection improvements]"
-          },
           "layout": {
             "title": "Layout",
             "default": 96,
+            "enum": [
+              96,
+              384
+            ],
             "type": "integer",
             "description": "Plate layout for the Zarr file. Valid options are 96 and 384"
+          },
+          "mode": {
+            "title": "Mode",
+            "default": "MD Stack Acquisition",
+            "enum": [
+              "MD Stack Acquisition",
+              "MD Single Plane Acquisition",
+              "MixedAcquisition"
+            ],
+            "type": "string",
+            "description": "Choose \"MD Stack Acquisition\" for 3D datasets, \"SinglePlaneAcquisition\" for 2D datasets or \"MixedAcquisition\" for combined acquisitions. [TBD selection improvements]"
           },
           "order_name": {
             "title": "Order Name",
@@ -67,25 +80,24 @@
             "default": 2,
             "type": "integer",
             "description": "Linear coarsening factor between subsequent levels. If set to `2`, level 1 is 2x downsampled, level 2 is 4x downsampled etc."
+          },
+          "parallelize": {
+            "title": "Parallelize",
+            "default": true,
+            "type": "boolean",
+            "description": "The automatic distribute.Client option often fails to finish when running the task locally. Set parallelize to false to avoid that."
           }
         },
         "required": [
-          "input_paths",
-          "output_path",
-          "metadata"
+          "zarr_urls",
+          "zarr_dir",
+          "image_dir"
         ],
         "additionalProperties": false
       },
-      "executable": "md_create_ome_zarr.py",
-      "input_type": "image",
-      "meta": {
-        "cpus_per_task": 4,
-        "mem": 16000
-      },
-      "name": "MD Convert OME-Zarr",
-      "output_type": "zarr",
-      "docs_info": "Create OME-Zarr plate from MD Image Xpress files.\n\nThis is a non-parallel task => it parses the metadata, creates the plates\nand then converts all the wells in the same process",
-      "docs_link": "https://github.com/jluethi/fractal-faim-hcs"
+      "docs_info": "## md_create_ome_zarr\nCreate OME-Zarr plate from MD Image Xpress files.\n\nThis is a non-parallel task => it parses the metadata, creates the plates\nand then converts all the wells in the same process\n"
     }
-  ]
+  ],
+  "has_args_schemas": true,
+  "args_schema_version": "pydantic_v1"
 }
