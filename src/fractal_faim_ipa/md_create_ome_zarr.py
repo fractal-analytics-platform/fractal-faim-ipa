@@ -6,7 +6,7 @@ from typing import Any, Literal
 
 import distributed
 from faim_ipa.hcs.acquisition import TileAlignmentOptions
-from faim_ipa.hcs.converter import ConvertToNGFFPlate, NGFFPlate
+from faim_ipa.hcs.converter import ConvertToNGFFPlate, NGFFPlate, PlateLayout
 from faim_ipa.stitching import stitching_utils
 from fractal_tasks_core.tables import write_table
 from pydantic.decorator import validate_arguments
@@ -38,7 +38,7 @@ def md_create_ome_zarr(
     order_name: str = "example-order",
     barcode: str = "example-barcode",
     overwrite: bool = True,  # FIXME: Are overwrite checks still possible?
-    coarsening_xy: int = 2,  # TODO: Only add to second task?
+    binning: int = 1,
     parallelize: bool = True,
 ) -> dict[str, Any]:
     """
@@ -63,9 +63,8 @@ def md_create_ome_zarr(
         order_name: Name of the order
         barcode: Barcode of the plate
         overwrite: Whether to overwrite the zarr file if it already exists
-        coarsening_xy: Linear coarsening factor between subsequent levels.
-            If set to `2`, level 1 is 2x downsampled, level 2 is
-            4x downsampled etc.
+        binning: Binning factor to downsample the original image. If set to 2,
+            an image that is 2x2 downsampled in xy will be produced.
         parallelize: The automatic distribute.Client option often fails to
             finish when running the task locally. Set parallelize to false to
             avoid that.
@@ -73,8 +72,8 @@ def md_create_ome_zarr(
     Returns:
         Metadata dictionary
     """
-    # mode = ModeEnum(mode)
-    # layout = PlateLayout(layout)
+    mode = ModeEnum(mode)
+    layout = PlateLayout(layout)
     zarr_dir = zarr_dir.rstrip("/")
 
     # TO REVIEW: Overwrite checks are not exposed in faim-hcs API
@@ -112,7 +111,7 @@ def md_create_ome_zarr(
             order_name=order_name,
             barcode=barcode,
         ),
-        yx_binning=coarsening_xy,
+        yx_binning=binning,
         warp_func=stitching_utils.translate_tiles_2d,
         fuse_func=stitching_utils.fuse_mean,
         client=client,
