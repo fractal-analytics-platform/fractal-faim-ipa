@@ -24,7 +24,7 @@ def test_ome_zarr_conversion():
 
     output_name = "OME-Zarr"
 
-    md_create_ome_zarr(
+    image_list_update = md_create_ome_zarr(
         zarr_urls=[],
         zarr_dir=str(zarr_root),
         image_dir=image_dir,
@@ -35,6 +35,23 @@ def test_ome_zarr_conversion():
         barcode=barcode,
         overwrite=overwrite,
     )
+    expected_image_list_update = [
+        {
+            "zarr_url": f"{zarr_root}/{output_name}.zarr/E/08/0",
+            "attributes": {"plate": output_name + ".zarr", "well": "E08"},
+            "types": {
+                "is_3D": True,
+            },
+        },
+        {
+            "zarr_url": f"{zarr_root}/{output_name}.zarr/E/07/0",
+            "attributes": {"plate": output_name + ".zarr", "well": "E07"},
+            "types": {
+                "is_3D": True,
+            },
+        },
+    ]
+    assert expected_image_list_update == image_list_update["image_list_updates"]
 
     assert (
         zarr_root

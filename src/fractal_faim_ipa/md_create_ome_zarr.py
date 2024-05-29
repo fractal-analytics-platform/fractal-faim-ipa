@@ -126,6 +126,7 @@ def md_create_ome_zarr(
     plate_name = zarr_name + ".zarr"
 
     image_list_updates = []
+    # TODO: Add more robust handling for dimensionality detection
     if mode == ModeEnum.SinglePlaneAcquisition:
         is_3D = False
     else:
