@@ -2,7 +2,7 @@
   "manifest_version": "2",
   "task_list": [
     {
-      "name": "FAIM-IPA Convert MD to OME-Zarr",
+      "name": "Convert MD to OME-Zarr",
       "executable_non_parallel": "md_create_ome_zarr.py",
       "meta_non_parallel": {
         "cpus_per_task": 8,
@@ -75,11 +75,11 @@
             "type": "boolean",
             "description": "Whether to overwrite the zarr file if it already exists"
           },
-          "coarsening_xy": {
-            "title": "Coarsening Xy",
-            "default": 2,
+          "binning": {
+            "title": "Binning",
+            "default": 1,
             "type": "integer",
-            "description": "Linear coarsening factor between subsequent levels. If set to `2`, level 1 is 2x downsampled, level 2 is 4x downsampled etc."
+            "description": "Binning factor to downsample the original image. If set to 2, an image that is 2x2 downsampled in xy will be produced."
           },
           "parallelize": {
             "title": "Parallelize",
