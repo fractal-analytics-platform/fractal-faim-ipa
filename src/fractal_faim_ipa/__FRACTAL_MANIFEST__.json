@@ -2,14 +2,14 @@
   "manifest_version": "2",
   "task_list": [
     {
-      "name": "Convert MD to OME-Zarr",
-      "executable_non_parallel": "md_create_ome_zarr.py",
+      "name": "FAIM IPA OME-Zarr Converter",
+      "executable_non_parallel": "convert_ome_zarr.py",
       "meta_non_parallel": {
         "cpus_per_task": 8,
         "mem": 32000
       },
       "args_schema_non_parallel": {
-        "title": "MdCreateOmeZarr",
+        "title": "ConvertOmeZarr",
         "type": "object",
         "properties": {
           "zarr_urls": {
@@ -95,7 +95,7 @@
         ],
         "additionalProperties": false
       },
-      "docs_info": "## md_create_ome_zarr\nCreate OME-Zarr plate from MD Image Xpress files.\n\nThis is a non-parallel task => it parses the metadata, creates the plates\nand then converts all the wells in the same process\n"
+      "docs_info": "## convert_ome_zarr\nCreate OME-Zarr plate from MD Image Xpress files.\n\nThis is a non-parallel task => it parses the metadata, creates the plates\nand then converts all the wells in the same process\n"
     }
   ],
   "has_args_schemas": true,
