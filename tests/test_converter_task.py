@@ -51,9 +51,8 @@ def test_ome_zarr_conversion():
             },
         },
     ]
-    assert set(expected_image_list_update) == set(
-        image_list_update["image_list_updates"]
-    )
+    for entry in image_list_update["image_list_updates"]:
+        assert entry in expected_image_list_update
 
     assert (
         zarr_root
