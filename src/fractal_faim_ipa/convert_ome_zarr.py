@@ -23,21 +23,26 @@ def convert_ome_zarr(
     zarr_urls: list[str],
     zarr_dir: str,
     image_dir: str,
-    zarr_name: str = "Plate",
-    # mode: ModeEnum = "MD Stack Acquisition",
     # # TODO: Figure out a way to use the Enums directly with working manifest building
-    # layout: PlateLayout = 96,
     # mode: ModeEnum = "MD Stack Acquisition",
+    # layout: PlateLayout = 96,
+    # tile_alignment: TileAlignmentOptions = "GridAlignment",
     mode: Literal[
-        "MD Stack Acquisition", "MD Single Plane Acquisition", "MD MixedAcquisition", "MetaXpress MD Stack Acquisition", "MetaXpress MD Single Plane Acquisition", "MetaXpress MD Single Plane Acquisition", "MetaXpress MD Single Plane Acquisition as 3D"
+        "MD Stack Acquisition",
+        "MD Single Plane Acquisition",
+        "MD MixedAcquisition",
+        "MetaXpress MD Stack Acquisition",
+        "MetaXpress MD Single Plane Acquisition",
+        "MetaXpress MD Single Plane Acquisition",
+        "MetaXpress MD Single Plane Acquisition as 3D",
     ],
+    zarr_name: str = "Plate",
+    tile_alignment: Literal["StageAlignment", "GridAlignment"] = "GridAlignment",
     layout: Literal[96, 384] = 96,
-    # # TODO: Verify whether this works for building the manifest
-    # layout: int = 96,
-    # query: str = "",  # FIXME: Is filtering still possible?
+    query: str = "",
     order_name: str = "example-order",
     barcode: str = "example-barcode",
-    overwrite: bool = True,  # FIXME: Are overwrite checks still possible?
+    overwrite: bool = False,
     binning: int = 1,
     parallelize: bool = True,
 ) -> dict[str, Any]:
@@ -56,10 +61,14 @@ def convert_ome_zarr(
             (standard argument for Fractal tasks, managed by Fractal server).
         image_dir: Path to the folder containing the images to be converted.
         zarr_name: Name of the zarr plate file that will be created
-        mode: Choose "MD Stack Acquisition" for 3D datasets,
-            "SinglePlaneAcquisition" for 2D datasets or "MixedAcquisition"
-            for combined acquisitions. [TBD selection improvements]
+        mode: Choose conversion mode. MetaXpress modes are used when data is
+            exported via MetaXpress. Choose whether you have 3D data
+            (StackAcquisition), 2D data (Single Plane Acquisition) or mixed.
+        tile_alignment: Choose whether tiles are placed into the OME-Zarr as a
+            grid or whether they are placed based on the position of field of
+            views in the metadata (using fusion for shared areas).
         layout: Plate layout for the Zarr file. Valid options are 96 and 384
+        query: Pandas query to filter the file list.
         order_name: Name of the order
         barcode: Barcode of the plate
         overwrite: Whether to overwrite the zarr file if it already exists
@@ -74,6 +83,7 @@ def convert_ome_zarr(
     """
     mode = ModeEnum(mode)
     layout = PlateLayout(layout)
+    tile_alignment = TileAlignmentOptions(tile_alignment)
     zarr_dir = zarr_dir.rstrip("/")
 
     # TO REVIEW: Overwrite checks are not exposed in faim-hcs API
@@ -84,12 +94,14 @@ def convert_ome_zarr(
         # Remove zarr if it already exists.
         shutil.rmtree(join(zarr_dir, zarr_name + ".zarr"))
 
-    # TO REVIEW: Any options for using queries / subset filters in new mode?
+    # Query handling (only implemented in MetaXpress modes)
+    if query == "":
+        query = None
 
-    # TODO: Expose non-grid stitching
-    plate_acquisition = ModeEnum(mode).get_plate_acquisition(
+    plate_acquisition = mode.get_plate_acquisition(
         acquisition_dir=image_dir,
-        alignment=TileAlignmentOptions.GRID,
+        alignment=tile_alignment,
+        query=query,
     )
 
     # The automatic distribute.Client option often fails to finish when
@@ -127,8 +139,13 @@ def convert_ome_zarr(
 
     image_list_updates = []
     # TODO: Add more robust handling for dimensionality detection
-    if mode == ModeEnum.SinglePlaneAcquisition:
+    if (
+        mode == ModeEnum.SinglePlaneAcquisition
+        or mode == ModeEnum.MetaXpressSinglePlaneAcquisition
+        or ModeEnum.MetaXpressSinglePlaneAcquisition_as3D
+    ):
         is_3D = False
+    # TODO: Handle mixed case
     else:
         is_3D = True
 
