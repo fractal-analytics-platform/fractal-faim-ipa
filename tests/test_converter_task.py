@@ -34,15 +34,8 @@ def test_ome_zarr_conversion():
         order_name=order_name,
         barcode=barcode,
         overwrite=overwrite,
-    )
+    )["image_list_updates"]
     expected_image_list_update = [
-        {
-            "zarr_url": f"{zarr_root}/{output_name}.zarr/E/08/0",
-            "attributes": {"plate": output_name + ".zarr", "well": "E08"},
-            "types": {
-                "is_3D": True,
-            },
-        },
         {
             "zarr_url": f"{zarr_root}/{output_name}.zarr/E/07/0",
             "attributes": {"plate": output_name + ".zarr", "well": "E07"},
@@ -50,9 +43,16 @@ def test_ome_zarr_conversion():
                 "is_3D": True,
             },
         },
+        {
+            "zarr_url": f"{zarr_root}/{output_name}.zarr/E/08/0",
+            "attributes": {"plate": output_name + ".zarr", "well": "E08"},
+            "types": {
+                "is_3D": True,
+            },
+        },
     ]
-    for entry in image_list_update["image_list_updates"]:
-        assert entry in expected_image_list_update
+    image_list_update.sort(key=lambda x: x["zarr_url"])
+    assert expected_image_list_update == image_list_update
 
     assert (
         zarr_root

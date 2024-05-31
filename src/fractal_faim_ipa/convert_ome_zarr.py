@@ -142,7 +142,7 @@ def convert_ome_zarr(
     if (
         mode == ModeEnum.SinglePlaneAcquisition
         or mode == ModeEnum.MetaXpressSinglePlaneAcquisition
-        or ModeEnum.MetaXpressSinglePlaneAcquisition_as3D
+        or mode == ModeEnum.MetaXpressSinglePlaneAcquisition_as3D
     ):
         is_3D = False
     # TODO: Handle mixed case
