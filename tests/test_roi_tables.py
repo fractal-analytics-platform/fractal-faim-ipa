@@ -105,6 +105,11 @@ def test_roi_table_overlaps(alignment):
             0.36000001430511475,
         ],
     }
+    from devtools import debug
+
+    debug(target_values_fov)
+    debug(df_fov.loc["FOV_4"].values.flatten().tolist())
+    debug(df_fov.loc["FOV_4"])
     assert all(
         math.isclose(a, b, rel_tol=1e-5)
         for a, b in zip(
