@@ -5,7 +5,7 @@ from faim_ipa.hcs.acquisition import PlateAcquisition, WellAcquisition
 from faim_ipa.stitching import Tile
 
 
-def create_ROI_tables(plate_acquistion: PlateAcquisition):
+def create_ROI_tables(plate_acquisition: PlateAcquisition):
     """Generate ROI tables for all images in a plate."""
     columns = [
         "FieldIndex",
@@ -17,7 +17,7 @@ def create_ROI_tables(plate_acquistion: PlateAcquisition):
         "len_z_micrometer",
     ]
     plate_roi_tables = {}
-    for well_acquisition in plate_acquistion.get_well_acquisitions():
+    for well_acquisition in plate_acquisition.get_well_acquisitions():
         # Get pixel sizes
         xy_spacing = well_acquisition.get_yx_spacing()
         z_spacing = well_acquisition.get_z_spacing()

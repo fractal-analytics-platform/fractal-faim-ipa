@@ -30,11 +30,11 @@ def convert_ome_zarr(
     mode: Literal[
         "MD Stack Acquisition",
         "MD Single Plane Acquisition",
-        "MD MixedAcquisition",
+        "MD Mixed Acquisition",
         "MetaXpress MD Stack Acquisition",
         "MetaXpress MD Single Plane Acquisition",
-        "MetaXpress MD Single Plane Acquisition",
         "MetaXpress MD Single Plane Acquisition as 3D",
+        "MetaXpress MD Mixed Acquisition",
     ],
     zarr_name: str = "Plate",
     tile_alignment: Literal["StageAlignment", "GridAlignment"] = "GridAlignment",
@@ -159,7 +159,7 @@ def convert_ome_zarr(
     )
 
     # Write ROI tables to the images
-    roi_tables = create_ROI_tables(plate_acquistion=plate_acquisition)
+    roi_tables = create_ROI_tables(plate_acquisition=plate_acquisition)
     for well_acquisition in well_acquisitions:
         # Write the tables
         well_rc = well_acquisition.get_row_col()
