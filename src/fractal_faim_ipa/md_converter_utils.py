@@ -17,7 +17,7 @@ class ModeEnum(Enum):
     StackAcquisition = "MD Stack Acquisition"
     SinglePlaneAcquisition = "MD Single Plane Acquisition"
     MixedAcquisition = "MD MixedAcquisition"
-    MetaXpresstackAcquisition = "MetaXpress MD Stack Acquisition"
+    MetaXpressStackAcquisition = "MetaXpress MD Stack Acquisition"
     MetaXpressSinglePlaneAcquisition = "MetaXpress MD Single Plane Acquisition"
     MetaXpressMixedAcquisition = "MetaXpress MD Single Plane Acquisition"
     MetaXpressSinglePlaneAcquisition_as3D = "MetaXpress MD Single Plane Acquisition as 3D"
@@ -30,7 +30,7 @@ class ModeEnum(Enum):
             return SinglePlaneAcquisition(acquisition_dir, alignment)
         elif self == ModeEnum.MixedAcquisition:
             return MixedAcquisition(acquisition_dir, alignment)
-        elif self == ModeEnum.MetaXpresstackAcquisition:
+        elif self == ModeEnum.MetaXpressStackAcquisition:
             return fractal_faim_ipa.imagexpress_zmb.StackAcquisition(acquisition_dir, alignment, query=query)
         elif self == ModeEnum.MetaXpressSinglePlaneAcquisition:
             return fractal_faim_ipa.imagexpress_zmb.SinglePlaneAcquisition(acquisition_dir, alignment, query=query)
