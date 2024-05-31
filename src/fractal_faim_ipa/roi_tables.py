@@ -21,6 +21,10 @@ def create_ROI_tables(plate_acquisition: PlateAcquisition):
         # Get pixel sizes
         xy_spacing = well_acquisition.get_yx_spacing()
         z_spacing = well_acquisition.get_z_spacing()
+        # Set Z spacing to 1 if it's not set, because Fractal ROI tables
+        # always contain XYZ information.
+        if z_spacing is None:
+            z_spacing = 1
         pixel_size_zyx = (z_spacing, *xy_spacing)
 
         # Create ROI tables

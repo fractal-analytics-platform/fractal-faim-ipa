@@ -35,10 +35,11 @@
             "enum": [
               "MD Stack Acquisition",
               "MD Single Plane Acquisition",
-              "MD MixedAcquisition",
+              "MD Mixed Acquisition",
               "MetaXpress MD Stack Acquisition",
               "MetaXpress MD Single Plane Acquisition",
-              "MetaXpress MD Single Plane Acquisition as 3D"
+              "MetaXpress MD Single Plane Acquisition as 3D",
+              "MetaXpress MD Mixed Acquisition"
             ],
             "type": "string",
             "description": "Choose conversion mode. MetaXpress modes are used when data is exported via MetaXpress. Choose whether you have 3D data (StackAcquisition), 2D data (Single Plane Acquisition) or mixed."

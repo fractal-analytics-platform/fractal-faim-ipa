@@ -8,11 +8,14 @@ from fractal_faim_ipa.md_converter_utils import ModeEnum
 from fractal_faim_ipa.roi_tables import create_ROI_tables
 
 
-def test_roi_tables():
+@pytest.mark.parametrize(
+    "mode", ["MD Stack Acquisition", "MD Single Plane Acquisition"]
+)
+def test_roi_tables(mode):
     ROOT_DIR = Path(__file__).parent
     image_dir = str(join(ROOT_DIR.parent, "resources", "Projection-Mix"))
 
-    mode = ModeEnum.StackAcquisition
+    mode = ModeEnum(mode)
     plate_acquisition = mode.get_plate_acquisition(
         acquisition_dir=image_dir,
         alignment=TileAlignmentOptions.GRID,
@@ -20,8 +23,6 @@ def test_roi_tables():
     roi_tables = create_ROI_tables(plate_acquisition=plate_acquisition)
     assert set(roi_tables.keys()) == {"E08", "E07"}
     assert set(roi_tables["E08"].keys()) == {"FOV_ROI_table", "well_ROI_table"}
-    print(roi_tables["E08"]["FOV_ROI_table"].to_df())
-    print(roi_tables["E08"]["well_ROI_table"].to_df())
 
     target_values = [
         0.0,
@@ -31,6 +32,9 @@ def test_roi_tables():
         699.8015747070312,
         50.0,
     ]
+    if mode == ModeEnum.SinglePlaneAcquisition:
+        target_values[5] = 1.0
+
     assert all(
         math.isclose(a, b, rel_tol=1e-5)
         for a, b in zip(
@@ -59,6 +63,8 @@ def test_roi_tables():
         699.8015747070312,
         50.0,
     ]
+    if mode == ModeEnum.SinglePlaneAcquisition:
+        target_values[5] = 1.0
     assert all(
         math.isclose(a, b, rel_tol=1e-5)
         for a, b in zip(df_fov.loc["FOV_2"].values.flatten().tolist(), target_values)
@@ -117,3 +123,60 @@ def test_roi_table_overlaps(alignment):
             target_values_well[alignment],
         )
     )
+
+
+# def test_roi_tables_2d():
+#     ROOT_DIR = Path(__file__).parent
+#     image_dir = str(join(ROOT_DIR.parent, "resources", "Projection-Mix"))
+
+#     mode = ModeEnum.SinglePlaneAcquisition
+#     plate_acquisition = mode.get_plate_acquisition(
+#         acquisition_dir=image_dir,
+#         alignment=TileAlignmentOptions.GRID,
+#     )
+#     roi_tables = create_ROI_tables(plate_acquisition=plate_acquisition)
+#     assert set(roi_tables.keys()) == {"E08", "E07"}
+#     assert set(roi_tables["E08"].keys()) == {"FOV_ROI_table", "well_ROI_table"}
+#     print(roi_tables["E08"]["FOV_ROI_table"].to_df())
+#     print(roi_tables["E08"]["well_ROI_table"].to_df())
+
+# target_values = [
+#     0.0,
+#     0.0,
+#     0.0,
+#     1399.6031494140625,
+#     699.8015747070312,
+#     50.0,
+# ]
+# assert all(
+#     math.isclose(a, b, rel_tol=1e-5)
+#     for a, b in zip(
+#         roi_tables["E08"]["well_ROI_table"].to_df().values.flatten().tolist(),
+#         target_values,
+#     )
+# )
+
+# roi_columns = [
+#     "x_micrometer",
+#     "y_micrometer",
+#     "z_micrometer",
+#     "len_x_micrometer",
+#     "len_y_micrometer",
+#     "len_z_micrometer",
+# ]
+
+# df_fov = roi_tables["E08"]["FOV_ROI_table"].to_df()
+# assert list(df_fov.columns) == roi_columns
+# assert len(df_fov) == 2
+# target_values = [
+#     699.8015747070312,
+#     0.0,
+#     0.0,
+#     699.8015747070312,
+#     699.8015747070312,
+#     50.0,
+# ]
+# assert all(
+#     math.isclose(a, b, rel_tol=1e-5)
+#     for a, b in zip(df_fov.loc["FOV_2"].values.flatten().tolist(), target_values)
+# )
