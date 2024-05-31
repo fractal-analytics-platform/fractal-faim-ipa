@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 @validate_arguments
-def md_create_ome_zarr(
+def convert_ome_zarr(
     *,
     zarr_urls: list[str],
     zarr_dir: str,
@@ -179,6 +179,6 @@ if __name__ == "__main__":
     from fractal_tasks_core.tasks._utils import run_fractal_task
 
     run_fractal_task(
-        task_function=md_create_ome_zarr,
+        task_function=convert_ome_zarr,
         logger_name=logger.name,
     )

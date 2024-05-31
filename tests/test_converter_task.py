@@ -6,7 +6,7 @@ from os.path import join
 from pathlib import Path
 
 import anndata as ad
-from fractal_faim_ipa.md_create_ome_zarr import md_create_ome_zarr
+from fractal_faim_ipa.convert_ome_zarr import convert_ome_zarr
 
 
 def test_ome_zarr_conversion():
@@ -24,7 +24,7 @@ def test_ome_zarr_conversion():
 
     output_name = "OME-Zarr"
 
-    image_list_update = md_create_ome_zarr(
+    image_list_update = convert_ome_zarr(
         zarr_urls=[],
         zarr_dir=str(zarr_root),
         image_dir=image_dir,
