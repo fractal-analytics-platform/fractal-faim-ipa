@@ -52,7 +52,7 @@
             "enum": [
               "MD Stack Acquisition",
               "MD Single Plane Acquisition",
-              "MixedAcquisition"
+              "MD MixedAcquisition"
             ],
             "type": "string",
             "description": "Choose \"MD Stack Acquisition\" for 3D datasets, \"SinglePlaneAcquisition\" for 2D datasets or \"MixedAcquisition\" for combined acquisitions. [TBD selection improvements]"

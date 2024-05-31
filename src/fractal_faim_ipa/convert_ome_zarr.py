@@ -30,7 +30,7 @@ def convert_ome_zarr(
     # mode: ModeEnum = "MD Stack Acquisition",
     layout: Literal[96, 384] = 96,
     mode: Literal[
-        "MD Stack Acquisition", "MD Single Plane Acquisition", "MixedAcquisition"
+        "MD Stack Acquisition", "MD Single Plane Acquisition", "MD MixedAcquisition"
     ] = "MD Stack Acquisition",
     # # TODO: Verify whether this works for building the manifest
     # layout: int = 96,
