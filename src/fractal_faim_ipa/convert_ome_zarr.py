@@ -28,10 +28,10 @@ def convert_ome_zarr(
     # # TODO: Figure out a way to use the Enums directly with working manifest building
     # layout: PlateLayout = 96,
     # mode: ModeEnum = "MD Stack Acquisition",
-    layout: Literal[96, 384] = 96,
     mode: Literal[
-        "MD Stack Acquisition", "MD Single Plane Acquisition", "MD MixedAcquisition"
-    ] = "MD Stack Acquisition",
+        "MD Stack Acquisition", "MD Single Plane Acquisition", "MD MixedAcquisition", "MetaXpress MD Stack Acquisition", "MetaXpress MD Single Plane Acquisition", "MetaXpress MD Single Plane Acquisition", "MetaXpress MD Single Plane Acquisition as 3D"
+    ],
+    layout: Literal[96, 384] = 96,
     # # TODO: Verify whether this works for building the manifest
     # layout: int = 96,
     # query: str = "",  # FIXME: Is filtering still possible?
