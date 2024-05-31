@@ -30,11 +30,34 @@
             "type": "string",
             "description": "Path to the folder containing the images to be converted."
           },
+          "mode": {
+            "title": "Mode",
+            "enum": [
+              "MD Stack Acquisition",
+              "MD Single Plane Acquisition",
+              "MD MixedAcquisition",
+              "MetaXpress MD Stack Acquisition",
+              "MetaXpress MD Single Plane Acquisition",
+              "MetaXpress MD Single Plane Acquisition as 3D"
+            ],
+            "type": "string",
+            "description": "Choose conversion mode. MetaXpress modes are used when data is exported via MetaXpress. Choose whether you have 3D data (StackAcquisition), 2D data (Single Plane Acquisition) or mixed."
+          },
           "zarr_name": {
             "title": "Zarr Name",
             "default": "Plate",
             "type": "string",
             "description": "Name of the zarr plate file that will be created"
+          },
+          "tile_alignment": {
+            "title": "Tile Alignment",
+            "default": "GridAlignment",
+            "enum": [
+              "StageAlignment",
+              "GridAlignment"
+            ],
+            "type": "string",
+            "description": "Choose whether tiles are placed into the OME-Zarr as a grid or whether they are placed based on the position of field of views in the metadata (using fusion for shared areas)."
           },
           "layout": {
             "title": "Layout",
@@ -46,16 +69,11 @@
             "type": "integer",
             "description": "Plate layout for the Zarr file. Valid options are 96 and 384"
           },
-          "mode": {
-            "title": "Mode",
-            "default": "MD Stack Acquisition",
-            "enum": [
-              "MD Stack Acquisition",
-              "MD Single Plane Acquisition",
-              "MD MixedAcquisition"
-            ],
+          "query": {
+            "title": "Query",
+            "default": "",
             "type": "string",
-            "description": "Choose \"MD Stack Acquisition\" for 3D datasets, \"SinglePlaneAcquisition\" for 2D datasets or \"MixedAcquisition\" for combined acquisitions. [TBD selection improvements]"
+            "description": "Pandas query to filter the file list."
           },
           "order_name": {
             "title": "Order Name",
@@ -71,7 +89,7 @@
           },
           "overwrite": {
             "title": "Overwrite",
-            "default": true,
+            "default": false,
             "type": "boolean",
             "description": "Whether to overwrite the zarr file if it already exists"
           },
@@ -91,7 +109,8 @@
         "required": [
           "zarr_urls",
           "zarr_dir",
-          "image_dir"
+          "image_dir",
+          "mode"
         ],
         "additionalProperties": false
       },
