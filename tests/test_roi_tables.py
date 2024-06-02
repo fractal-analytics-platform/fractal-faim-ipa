@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from faim_ipa.hcs.acquisition import TileAlignmentOptions
 from fractal_faim_ipa.md_converter_utils import ModeEnum
-from fractal_faim_ipa.roi_tables import create_ROI_tables
+from fractal_faim_ipa.roi_tables import _extract_fov_sort_key, create_ROI_tables
 
 
 @pytest.mark.parametrize(
@@ -127,4 +127,26 @@ def test_roi_table_overlaps(alignment):
             df_well.loc["well_1"].values.flatten().tolist(),
             target_values_well[alignment],
         )
+    )
+
+
+def test_roi_sorting():
+    ROOT_DIR = Path(__file__).parent
+    image_dir = str(join(ROOT_DIR.parent, "resources", "Projection-Mix"))
+
+    mode = ModeEnum("MD Stack Acquisition")
+    plate_acquisition = mode.get_plate_acquisition(
+        acquisition_dir=image_dir,
+        alignment=TileAlignmentOptions.GRID,
+    )
+    well_acquisition = plate_acquisition.get_well_acquisitions(selection=["E07"])[0]
+    tiles = well_acquisition.get_tiles()
+    sorted_tiles = sorted(tiles, key=_extract_fov_sort_key)
+    assert (
+        sorted_tiles[0].path.split("/")[-1]
+        == "Projection-Mix_E07_s1_w1091EB8A5-272A-466D-B8A0-7547C6BA392B.tif"
+    )
+    assert (
+        sorted_tiles[-1].path.split("/")[-1]
+        == "Projection-Mix_E07_s2_w4F95A8A9F-0939-47C2-8D3E-F6E91AF0C4ED.tif"
     )

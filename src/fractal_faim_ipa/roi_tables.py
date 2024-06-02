@@ -1,3 +1,5 @@
+import re
+
 import anndata as ad
 import numpy as np
 import pandas as pd
@@ -76,7 +78,12 @@ def create_fov_ROI_table(
     min_z = tile.position.z * pixel_size_zyx[0]
     max_z = (tile.position.z + 1) * pixel_size_zyx[0]
     fov_counter = 1
-    for tile in tiles:
+    # Initial robust sort
+    sorted_tiles = sorted(tiles)
+    # Sort again by trying to find site information as usually contained in
+    # MD filenames
+    sorted_tiles = sorted(sorted_tiles, key=_extract_fov_sort_key)
+    for tile in sorted_tiles:
         z_start = tile.position.z * pixel_size_zyx[0]
         z_end = (tile.position.z + 1) * pixel_size_zyx[0]
         if z_start < min_z:
@@ -105,3 +112,13 @@ def create_fov_ROI_table(
     # Cast the values to float to avoid anndata type issues
     roi_table = roi_table.astype(np.float32)
     return ad.AnnData(roi_table)
+
+
+def _extract_fov_sort_key(tile):
+    """Extract the FOV site information from an MD filename."""
+    filename = tile.path.split("/")[-1]
+    match = re.search(r"_s(\d+)_", filename)
+    if match:
+        return int(match.group(1)), filename
+    # Use a large number to push files without 's' to the end
+    return float("inf"), filename
