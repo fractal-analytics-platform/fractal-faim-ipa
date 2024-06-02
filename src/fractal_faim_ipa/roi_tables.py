@@ -78,8 +78,8 @@ def create_fov_ROI_table(
     min_z = tile.position.z * pixel_size_zyx[0]
     max_z = (tile.position.z + 1) * pixel_size_zyx[0]
     fov_counter = 1
-    # Initial robust sort
-    sorted_tiles = sorted(tiles)
+    # Initial robust sort based on full file paths
+    sorted_tiles = sorted(tiles, key=lambda tile: tile.path)
     # Sort again by trying to find site information as usually contained in
     # MD filenames
     sorted_tiles = sorted(sorted_tiles, key=_extract_fov_sort_key)
