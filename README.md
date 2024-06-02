@@ -1,10 +1,10 @@
-# fractal-faim-hcs
+# fractal-faim-ipa
 
-[![License](https://img.shields.io/pypi/l/fractal-faim-hcs.svg?color=green)](https://github.com/jluethi/fractal-faim-hcs/raw/main/LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/fractal-faim-hcs.svg?color=green)](https://pypi.org/project/fractal-faim-hcs)
-[![Python Version](https://img.shields.io/pypi/pyversions/fractal-faim-hcs.svg?color=green)](https://python.org)
-[![CI](https://github.com/jluethi/fractal-faim-hcs/actions/workflows/ci.yml/badge.svg)](https://github.com/jluethi/fractal-faim-hcs/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/jluethi/fractal-faim-hcs/branch/main/graph/badge.svg)](https://codecov.io/gh/jluethi/fractal-faim-hcs)
+[![License](https://img.shields.io/pypi/l/fractal-faim-ipa.svg?color=green)](https://github.com/jluethi/fractal-faim-ipa/raw/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/fractal-faim-ipa.svg?color=green)](https://pypi.org/project/fractal-faim-ipa)
+[![Python Version](https://img.shields.io/pypi/pyversions/fractal-faim-ipa.svg?color=green)](https://python.org)
+[![CI](https://github.com/jluethi/fractal-faim-ipa/actions/workflows/ci.yml/badge.svg)](https://github.com/jluethi/fractal-faim-ipa/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/jluethi/fractal-faim-ipa/branch/main/graph/badge.svg)](https://codecov.io/gh/jluethi/fractal-faim-ipa)
 
 Provides Fractal tasks for the conversion of Molecular Devices ImageXpress microscope to OME-Zarr.
 
@@ -16,8 +16,8 @@ To use the MD Converter Task in Fractal, add the package form PyPI to your Fract
 You can install it locally in this way:
 
 ```
-git clone https://github.com/jluethi/fractal-faim-hcs
-cd fractal-faim-hcs
+git clone https://github.com/jluethi/fractal-faim-ipa
+cd fractal-faim-ipa
 pip install -e .
 ```
 
