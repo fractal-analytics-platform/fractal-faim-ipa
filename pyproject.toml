@@ -137,7 +137,7 @@ exclude_lines = [
     "raise NotImplementedError()",
 ]
 [tool.coverage.run]
-source = ["src"]
+source = ["src/fractal_faim_ipa"]
 
 # https://github.com/mgedmin/check-manifest#configuration
 # add files that you want check-manifest to explicitly ignore here
