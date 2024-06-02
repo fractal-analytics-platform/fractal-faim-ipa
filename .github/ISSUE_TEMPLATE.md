@@ -1,4 +1,4 @@
-* fractal-faim-hcs version:
+* fractal-faim-ipa version:
 * Python version:
 * Operating System:
 
