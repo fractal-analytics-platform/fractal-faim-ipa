@@ -51,10 +51,7 @@ jobs:
           python -m pip install .[test]
 
       - name: Install some testing dependencies (hard-coded)
-        run: python -m pip install pytest devtools jsonschema requests wget
-
-      - name: List files in the src directory
-        run: ls -al src/fractal_faim_ipa
+        run: python -m pip install pytest pytest-cov devtools jsonschema requests wget
 
       - name: 🧪 Run Tests
         run: pytest --color=yes --cov --cov-report=xml --cov-report=term-missing tests/
@@ -63,8 +60,6 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.xml
-          fail_ci_if_error: true
 
   deploy:
     name: Deploy
