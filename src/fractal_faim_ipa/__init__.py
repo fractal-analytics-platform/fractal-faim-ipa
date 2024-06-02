@@ -1,4 +1,4 @@
-"""Provides Fractal tasks for the MD to OME-Zarr conversion of faim-hcs"""
+"""Provides Fractal tasks for the MD to OME-Zarr conversion of faim-hcs."""
 
 from importlib.metadata import PackageNotFoundError, version
 

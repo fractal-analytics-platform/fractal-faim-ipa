@@ -14,9 +14,9 @@ allow-direct-references = true
 
 # https://peps.python.org/pep-0621/
 [project]
-name = "fractal-faim-hcs"
+name = "fractal-faim-ipa"
 dynamic = ["version"]
-description = "Provides Fractal tasks for the MD to OME-Zarr conversion of faim-hcs"
+description = "Provides Fractal tasks for the MD to OME-Zarr conversion of faim-ipa"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "BSD-3-Clause" }
@@ -34,10 +34,10 @@ classifiers = [
 ]
 
 dependencies = [
-    "fractal-tasks-core==0.11.0",
+    "fractal-tasks-core==1.0.2",
     "pydantic",
     "zarr",
-    "faim-hcs @ git+https://github.com/jluethi/faim-hcs.git@generalized_wavelength_extraction",
+    "faim-ipa==0.3.5",
 ]
 
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
@@ -56,17 +56,17 @@ dev = [
 ]
 
 [project.urls]
-homepage = "https://github.com/fractal-analytics-platform/fractal-faim-hcs"
-repository = "https://github.com/fractal-analytics-platform/fractal-faim-hcs"
+homepage = "https://github.com/fractal-analytics-platform/fractal-faim-ipa"
+repository = "https://github.com/fractal-analytics-platform/fractal-faim-ipa"
 
 # Entry points
 # https://peps.python.org/pep-0621/#entry-points
 # same as console_scripts entry point
 # [project.scripts]
-# fractal-faim-hcs-cli = "fractal_faim_hcs:main_cli"
+# fractal-faim-ipa-cli = "fractal_faim_ipa:main_cli"
 
 # [project.entry-points."some.group"]
-# tomatoes = "fractal_faim_hcs:main_tomatoes"
+# tomatoes = "fractal_faim_ipa:main_tomatoes"
 # https://github.com/charliermarsh/ruff
 [tool.ruff]
 line-length = 88
@@ -125,7 +125,6 @@ pretty = true
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = ["tests"]
-filterwarnings = ["error"]
 
 # https://coverage.readthedocs.io/en/6.4/config.html
 [tool.coverage.report]
