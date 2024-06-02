@@ -28,8 +28,12 @@ You can trigger a manual collection of the tasks:
 pip install build
 python -m build
 ```
-This wheel is put into the `dist` folder. To collect the task in Fractal, one can load the Python wheel (see instructions below):
-```
-fractal task collect /path/to/faim-hcs-version-details.whl
-```
 
+This wheel is put into the `dist` folder. 
+
+2. Collect your package from Fractal web: use the local task collection in fractal web and provide the `/path/to/package/dist/faim-ipa-version-details.whl`
+
+Alternatively, you can collect the task in Fractal via the CLI tool:
+```
+fractal task collect /path/to/package/dist/faim-ipa-version-details.whl
+```
