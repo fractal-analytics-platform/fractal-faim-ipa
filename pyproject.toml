@@ -34,10 +34,10 @@ classifiers = [
 ]
 
 dependencies = [
-    "fractal-tasks-core==1.0.2",
+    "fractal-tasks-core==1.2.1",
     "pydantic",
     "zarr",
-    "faim-ipa==0.3.11",
+    "faim-ipa==0.4.0",
 ]
 
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
@@ -53,6 +53,7 @@ dev = [
     "pdbpp",  # https://github.com/pdbpp/pdbpp
     "rich",  # https://github.com/Textualize/rich
     "ruff",
+    "pre-commit",
 ]
 
 [project.urls]
@@ -78,8 +79,6 @@ extend-select = [
     "F",    # flakes
     "D",    # pydocstyle
     "I",    # isort
-    "U",    # pyupgrade
-    # "S",    # bandit
     "C",    # flake8-comprehensions
     "B",    # flake8-bugbear
     "A001", # flake8-builtins
