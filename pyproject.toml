@@ -18,7 +18,7 @@ name = "fractal-faim-ipa"
 dynamic = ["version"]
 description = "Provides Fractal tasks for the MD to OME-Zarr conversion of faim-ipa"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { text = "BSD-3-Clause" }
 authors = [
     { name = "Joel Luethi", email = "joel.luethi@uzh.ch" },
