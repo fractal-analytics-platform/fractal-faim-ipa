@@ -7,9 +7,9 @@ import dask.array as da
 import pandas as pd
 
 from faim_ipa.hcs.acquisition import TileAlignmentOptions, WellAcquisition
-from faim_ipa.io.MetaSeriesTiff import load_metaseries_tiff_metadata
-from faim_ipa.stitching import Tile
-from faim_ipa.stitching.Tile import TilePosition
+from faim_ipa.io.metaseries import load_metaseries_tiff_metadata
+from faim_ipa.stitching.tile import Tile
+from faim_ipa.stitching.tile import TilePosition
 
 
 class ImageXpressWellAcquisition(WellAcquisition):

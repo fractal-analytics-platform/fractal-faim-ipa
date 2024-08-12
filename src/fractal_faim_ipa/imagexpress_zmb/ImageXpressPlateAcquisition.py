@@ -15,8 +15,8 @@ from faim_ipa.hcs.acquisition import (
 from fractal_faim_ipa.imagexpress_zmb.ImageXpressWellAcquisition import (
     ImageXpressWellAcquisition,
 )
-from faim_ipa.io.ChannelMetadata import ChannelMetadata
-from faim_ipa.io.MetaSeriesTiff import load_metaseries_tiff_metadata
+from faim_ipa.io.metadata import ChannelMetadata
+from faim_ipa.io.metaseries import load_metaseries_tiff_metadata
 from faim_ipa.utils import rgb_to_hex, wavelength_to_rgb
 
 

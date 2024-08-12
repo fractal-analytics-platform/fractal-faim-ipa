@@ -8,7 +8,7 @@ import pandas as pd
 
 from faim_ipa.hcs.acquisition import TileAlignmentOptions
 from fractal_faim_ipa.imagexpress_zmb import ImageXpressPlateAcquisition
-from faim_ipa.io.MetaSeriesTiff import load_metaseries_tiff_metadata
+from faim_ipa.io.metaseries import load_metaseries_tiff_metadata
 
 
 class MixedAcquisition(ImageXpressPlateAcquisition):
