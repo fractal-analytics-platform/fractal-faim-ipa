@@ -1,15 +1,13 @@
 from pathlib import Path
 from typing import Optional, Union
 
-import numpy as np
 import dask
 import dask.array as da
+import numpy as np
 import pandas as pd
-
 from faim_ipa.hcs.acquisition import TileAlignmentOptions, WellAcquisition
 from faim_ipa.io.metaseries import load_metaseries_tiff_metadata
-from faim_ipa.stitching.tile import Tile
-from faim_ipa.stitching.tile import TilePosition
+from faim_ipa.stitching.tile import Tile, TilePosition
 
 
 class ImageXpressWellAcquisition(WellAcquisition):
@@ -32,28 +30,30 @@ class ImageXpressWellAcquisition(WellAcquisition):
     def _assemble_tiles(self) -> list[Tile]:
         def _load_positions(fn):
             metadata = load_metaseries_tiff_metadata(fn)
-            out = np.array([
-                metadata["pixel-size-y"],
-                metadata["pixel-size-x"],
-                int(metadata["stage-position-y"] / metadata["spatial-calibration-y"]),
-                int(metadata["stage-position-x"] / metadata["spatial-calibration-x"]),
-            ])
+            out = np.array(
+                [
+                    metadata["pixel-size-y"],
+                    metadata["pixel-size-x"],
+                    int(
+                        metadata["stage-position-y"] / metadata["spatial-calibration-y"]
+                    ),
+                    int(
+                        metadata["stage-position-x"] / metadata["spatial-calibration-x"]
+                    ),
+                ]
+            )
             return out
-        
+
         fns = self._files.path.to_numpy()
         lazy_positions = [dask.delayed(_load_positions)(fn) for fn in fns]
         arrays = [
-            da.from_delayed(
-                lazy_position,
-                dtype=int,
-                shape=(4,)
-            )
+            da.from_delayed(lazy_position, dtype=int, shape=(4,))
             for lazy_position in lazy_positions
         ]
         positions = da.stack(arrays, axis=0).compute()
 
         tiles = []
-        for (i, row), pos in zip(self._files.iterrows(), positions):
+        for (_i, row), pos in zip(self._files.iterrows(), positions):
             file = row["path"]
             time_point = row["t"] if "t" in row.index and row["t"] is not None else 0
             channel = row["channel"]
@@ -98,12 +98,12 @@ class ImageXpressWellAcquisition(WellAcquisition):
         axes = ["y", "x"]
 
         if "z" in self._files.columns:
-            axes = ["z"] + axes
+            axes = ["z", *axes]
 
         if self._files["channel"].nunique() > 1:
-            axes = ["c"] + axes
+            axes = ["c", *axes]
 
         if "t" in self._files.columns and self._files["t"].nunique() > 1:
-            axes = ["t"] + axes
+            axes = ["t", *axes]
 
         return axes

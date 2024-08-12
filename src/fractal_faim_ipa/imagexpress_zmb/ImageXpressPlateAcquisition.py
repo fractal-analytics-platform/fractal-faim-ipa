@@ -5,19 +5,19 @@ from pathlib import Path
 from typing import Optional, Union
 
 import pandas as pd
-from tqdm import tqdm
-
 from faim_ipa.hcs.acquisition import (
     PlateAcquisition,
     TileAlignmentOptions,
     WellAcquisition,
 )
-from fractal_faim_ipa.imagexpress_zmb.ImageXpressWellAcquisition import (
-    ImageXpressWellAcquisition,
-)
 from faim_ipa.io.metadata import ChannelMetadata
 from faim_ipa.io.metaseries import load_metaseries_tiff_metadata
 from faim_ipa.utils import rgb_to_hex, wavelength_to_rgb
+from tqdm import tqdm
+
+from fractal_faim_ipa.imagexpress_zmb.ImageXpressWellAcquisition import (
+    ImageXpressWellAcquisition,
+)
 
 
 class ImageXpressPlateAcquisition(PlateAcquisition):
@@ -45,8 +45,7 @@ class ImageXpressPlateAcquisition(PlateAcquisition):
         DataFrame
             Table of all files in the acquisition.
         """
-        
-        files =  pd.DataFrame(
+        files = pd.DataFrame(
             ImageXpressPlateAcquisition._list_and_match_files(
                 root_dir=self._acquisition_dir,
                 root_re=self._get_root_re(),
