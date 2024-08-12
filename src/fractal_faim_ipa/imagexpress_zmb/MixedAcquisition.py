@@ -5,10 +5,10 @@ from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
-
 from faim_ipa.hcs.acquisition import TileAlignmentOptions
+from faim_ipa.io.metaseries import load_metaseries_tiff_metadata
+
 from fractal_faim_ipa.imagexpress_zmb import ImageXpressPlateAcquisition
-from faim_ipa.io.MetaSeriesTiff import load_metaseries_tiff_metadata
 
 
 class MixedAcquisition(ImageXpressPlateAcquisition):
@@ -19,14 +19,14 @@ class MixedAcquisition(ImageXpressPlateAcquisition):
     └── 2023-02-21 --> {date}
         └── 1334 --> {acquisition id}
             ├── ZStep_1
-            │   ├── Projection-Mix_E07_s1_w1E78EB128-BD0D-4D94-A6AD-3FF28BB1B105.tif
-            │   ├── Projection-Mix_E07_s1_w1_thumb187DE64B-038A-4671-BF6B-683721723769.tif
-            │   ├── Projection-Mix_E07_s1_w2C0A49256-E289-4C0F-ADC9-F7728ABDB141.tif
-            │   ├── Projection-Mix_E07_s1_w2_thumb57D4B151-71BF-480E-8CC4-C23A2690B763.tif
-            │   ├── Projection-Mix_E07_s1_w427CCB2E4-1BF4-45E7-8BC7-264B48EF9C4A.tif
-            │   ├── Projection-Mix_E07_s1_w4_thumb555647D0-77F1-4A43-9472-AE509F95E236.tif
-            │   ├── ...
-            │   └── Projection-Mix_E08_s2_w4_thumbD2785594-4F49-464F-9F80-1B82E30A560A.tif
+            │   ├── Projection-Mix_E07_s1_w1E78EB128-BD0D-4D94-A6AD-3FF28BB1B105.tif
+            │   ├── Projection-Mix_E07_s1_w1_thumb187DE64B-038A-4671-BF6B-683721723769.tif
+            │   ├── Projection-Mix_E07_s1_w2C0A49256-E289-4C0F-ADC9-F7728ABDB141.tif
+            │   ├── Projection-Mix_E07_s1_w2_thumb57D4B151-71BF-480E-8CC4-C23A2690B763.tif
+            │   ├── Projection-Mix_E07_s1_w427CCB2E4-1BF4-45E7-8BC7-264B48EF9C4A.tif
+            │   ├── Projection-Mix_E07_s1_w4_thumb555647D0-77F1-4A43-9472-AE509F95E236.tif
+            │   ├── ...
+            │   └── Projection-Mix_E08_s2_w4_thumbD2785594-4F49-464F-9F80-1B82E30A560A.tif
             ├── ...
             └── ZStep_9
                 ├── Projection-Mix_E07_s1_w1091EB8A5-272A-466D-B8A0-7547C6BA392B.tif
@@ -60,7 +60,9 @@ class MixedAcquisition(ImageXpressPlateAcquisition):
         # single-planes and projections are unnecessarily duplicated
         # -> remove duplicates from files
         for c in files.channel.unique():
-            file = files[(files.channel == c) & (files.z!='0') & (files.z!='1')].iloc[0]
+            file = files[
+                (files.channel == c) & (files.z != "0") & (files.z != "1")
+            ].iloc[0]
             metadata = load_metaseries_tiff_metadata(file.path)
             # projections have no "Z Step" attribute
             # single-planes have always metadata["Z Step"] == 1, for each duplicate
@@ -73,9 +75,7 @@ class MixedAcquisition(ImageXpressPlateAcquisition):
         return files
 
     def _get_root_re(self) -> re.Pattern:
-        return re.compile(
-            r".*[\/\\]TimePoint_(?P<t>\d+)[\/\\]ZStep_(?!0)(?P<z>\d+)"
-        )
+        return re.compile(r".*[\/\\]TimePoint_(?P<t>\d+)[\/\\]ZStep_(?!0)(?P<z>\d+)")
 
     def _get_filename_re(self) -> re.Pattern:
         return re.compile(
@@ -87,14 +87,14 @@ class MixedAcquisition(ImageXpressPlateAcquisition):
 
     def _compute_z_spacing(self, files: pd.DataFrame) -> Optional[float]:
         assert "z" in files.columns, "No z column in files DataFrame."
-        channel_with_stack = np.sort(files[files.z!='1']["channel"].unique())[0]
+        channel_with_stack = np.sort(files[files.z != "1"]["channel"].unique())[0]
         subset = files[files["channel"] == channel_with_stack]
         subset = subset[subset["well"] == np.sort(subset["well"].unique())[0]]
         subset = subset[subset["field"] == np.sort(subset["field"].unique())[0]]
 
         plane_positions = []
 
-        for i, row in subset.iterrows():
+        for _i, row in subset.iterrows():
             file = row["path"]
             if "z" in row.keys() and row["z"] is not None:
                 metadata = load_metaseries_tiff_metadata(file)

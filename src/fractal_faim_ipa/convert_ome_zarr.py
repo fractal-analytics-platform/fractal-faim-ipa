@@ -9,7 +9,7 @@ from faim_ipa.hcs.acquisition import TileAlignmentOptions
 from faim_ipa.hcs.converter import ConvertToNGFFPlate, NGFFPlate, PlateLayout
 from faim_ipa.stitching import stitching_utils
 from fractal_tasks_core.tables import write_table
-from pydantic.decorator import validate_arguments
+from pydantic import validate_call
 
 from fractal_faim_ipa.md_converter_utils import ModeEnum
 from fractal_faim_ipa.roi_tables import create_ROI_tables
@@ -17,7 +17,7 @@ from fractal_faim_ipa.roi_tables import create_ROI_tables
 logger = logging.getLogger(__name__)
 
 
-@validate_arguments
+@validate_call
 def convert_ome_zarr(
     *,
     zarr_urls: list[str],

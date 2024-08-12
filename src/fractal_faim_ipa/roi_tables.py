@@ -4,7 +4,7 @@ import anndata as ad
 import numpy as np
 import pandas as pd
 from faim_ipa.hcs.acquisition import PlateAcquisition, WellAcquisition
-from faim_ipa.stitching import Tile
+from faim_ipa.stitching.tile import Tile
 
 
 def create_ROI_tables(plate_acquisition: PlateAcquisition):

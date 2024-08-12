@@ -4,7 +4,6 @@
 [![PyPI](https://img.shields.io/pypi/v/fractal-faim-ipa.svg?color=green)](https://pypi.org/project/fractal-faim-ipa)
 [![Python Version](https://img.shields.io/pypi/pyversions/fractal-faim-ipa.svg?color=green)](https://python.org)
 [![CI](https://github.com/jluethi/fractal-faim-ipa/actions/workflows/ci.yml/badge.svg)](https://github.com/jluethi/fractal-faim-ipa/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/jluethi/fractal-faim-ipa/branch/main/graph/badge.svg)](https://codecov.io/gh/jluethi/fractal-faim-ipa)
 
 Provides Fractal tasks for the conversion of Molecular Devices ImageXpress microscope to OME-Zarr.
 

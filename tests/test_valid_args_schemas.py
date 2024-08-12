@@ -1,8 +1,5 @@
 import json
-import sys
-import typing
 from pathlib import Path
-from typing import Optional, Union
 
 import fractal_faim_ipa
 import pytest
@@ -25,72 +22,6 @@ PACKAGE_NAME = "fractal_faim_ipa"
 with (FRACTAL_TASKS_CORE_DIR / "__FRACTAL_MANIFEST__.json").open("r") as f:
     MANIFEST = json.load(f)
 TASK_LIST = MANIFEST["task_list"]
-
-
-def test_validate_function_signature():  # noqa C901
-    """
-    Showcase the expected behavior of _validate_function_signature
-    """
-
-    def fun1(x: int):
-        pass
-
-    _validate_function_signature(fun1)
-
-    def fun2(x, *args):
-        pass
-
-    # Fail because of args
-    with pytest.raises(ValueError):
-        _validate_function_signature(fun2)
-
-    def fun3(x, **kwargs):
-        pass
-
-    # Fail because of kwargs
-    with pytest.raises(ValueError):
-        _validate_function_signature(fun3)
-
-    def fun4(x: Optional[str] = None):
-        pass
-
-    _validate_function_signature(fun4)
-
-    def fun5(x: Optional[str]):
-        pass
-
-    _validate_function_signature(fun5)
-
-    def fun6(x: Optional[str] = "asd"):
-        pass
-
-    # Fail because of not-None default value for optional parameter
-    with pytest.raises(ValueError):
-        _validate_function_signature(fun6)
-
-    # NOTE: this test is only valid for python >= 3.10
-    if (sys.version_info.major, sys.version_info.minor) >= (3, 10):
-
-        def fun7(x: str | int):
-            pass
-
-        # Fail because of "|" not supported
-        with pytest.raises(ValueError):
-            _validate_function_signature(fun7)
-
-    def fun8(x: Union[str, None] = "asd"):
-        pass
-
-    # Fail because Union not supported
-    with pytest.raises(ValueError):
-        _validate_function_signature(fun8)
-
-    def fun9(x: typing.Union[str, int]):
-        pass
-
-    # Fail because Union not supported
-    with pytest.raises(ValueError):
-        _validate_function_signature(fun9)
 
 
 def test_manifest_has_args_schemas_is_true():

@@ -6,11 +6,11 @@ author_name: Joel Luethi
 git_versioning: true
 github_username: fractal-analytics-platform
 mode: customize
-module_name: fractal_faim_hcs
+module_name: fractal_faim_ipa
 project_license: BSD-3-Clause
-project_name: fractal-faim-hcs
+project_name: fractal-faim-ipa
 project_short_description: Provides Fractal tasks for the MD to OME-Zarr conversion
-    of faim-hcs
+    of faim-ipa
 test_pre_release: false
 use_black: true
 use_mypy: true

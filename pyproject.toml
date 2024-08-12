@@ -18,7 +18,7 @@ name = "fractal-faim-ipa"
 dynamic = ["version"]
 description = "Provides Fractal tasks for the MD to OME-Zarr conversion of faim-ipa"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { text = "BSD-3-Clause" }
 authors = [
     { name = "Joel Luethi", email = "joel.luethi@uzh.ch" },
@@ -34,17 +34,17 @@ classifiers = [
 ]
 
 dependencies = [
-    "fractal-tasks-core==1.0.2",
+    "fractal-tasks-core==1.2.1",
     "pydantic",
     "zarr",
-    "faim-ipa==0.3.11",
+    "faim-ipa==0.5.0",
 ]
 
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
 # "extras" (e.g. for `pip install .[test]`)
 [project.optional-dependencies]
 # add dependencies used for testing here
-test = ["pytest", "pytest-cov"]
+test = ["pytest", "pytest-cov", "jsonschema"]
 # add anything else you like to have in your dev environment here
 dev = [
     "black",
@@ -53,6 +53,8 @@ dev = [
     "pdbpp",  # https://github.com/pdbpp/pdbpp
     "rich",  # https://github.com/Textualize/rich
     "ruff",
+    "pre-commit",
+    "devtools",
 ]
 
 [project.urls]
@@ -78,8 +80,6 @@ extend-select = [
     "F",    # flakes
     "D",    # pydocstyle
     "I",    # isort
-    "U",    # pyupgrade
-    # "S",    # bandit
     "C",    # flake8-comprehensions
     "B",    # flake8-bugbear
     "A001", # flake8-builtins
