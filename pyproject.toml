@@ -54,6 +54,7 @@ dev = [
     "rich",  # https://github.com/Textualize/rich
     "ruff",
     "pre-commit",
+    "devtools",
 ]
 
 [project.urls]
