@@ -18,3 +18,11 @@ pip install fractal-faim-ipa
 
 ## Adding tasks to Fractal server
 You can add these Fractal tasks to a server by using the pypi installation and specifying the task name fractal-faim-ipa
+
+## Making releases
+1. Merge PR into main
+2. Locally checkout main
+3. Tag the release: git tag v0.4.3
+4. Push the tag to Github: git push origin v0.4.3
+
+The github workflow will then publish this release to PyPI & create a Github release with the corresponding whl file.
