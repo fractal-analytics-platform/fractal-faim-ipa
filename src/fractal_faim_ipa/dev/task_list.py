@@ -7,5 +7,8 @@ TASK_LIST = [
         name="FAIM IPA OME-Zarr Converter",
         executable="convert_ome_zarr.py",
         meta={"cpus_per_task": 8, "mem": 32000},
+        category="Conversion",
+        modality="HCS",
+        tags=["Molecular Devices", "Image Xpress", "MD"],
     ),
 ]
