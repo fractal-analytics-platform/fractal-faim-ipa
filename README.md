@@ -9,30 +9,12 @@ Provides Fractal tasks for the conversion of Molecular Devices ImageXpress micro
 
 The conversion based on the [faim-ipa library](https://github.com/fmi-faim/faim-ipa). This repo also contains some of the test data from the faim-ipa library, as well as test data from the ZMB provided by @fstur.
 
-To use the MD Converter Task in Fractal, add the package form PyPI to your Fractal server by installing fractal-faim-ipa.
-
-## Development
-You can install it locally in this way:
+## Installation
+Install this package as:
 
 ```
-git clone https://github.com/jluethi/fractal-faim-ipa
-cd fractal-faim-ipa
-pip install -e .
+pip install fractal-faim-ipa
 ```
 
-### Adding tasks to Fractal server
-You can trigger a manual collection of the tasks:
-1. Create a package wheel: 
-```
-pip install build
-python -m build
-```
-
-This wheel is put into the `dist` folder. 
-
-2. Collect your package from Fractal web: use the local task collection in fractal web and provide the `/path/to/package/dist/faim-ipa-version-details.whl`
-
-Alternatively, you can collect the task in Fractal via the CLI tool:
-```
-fractal task collect /path/to/package/dist/faim-ipa-version-details.whl
-```
+## Adding tasks to Fractal server
+You can add these Fractal tasks to a server by using the pypi installation and specifying the task name fractal-faim-ipa
