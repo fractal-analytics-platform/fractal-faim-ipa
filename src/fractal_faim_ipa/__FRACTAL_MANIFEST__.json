@@ -122,7 +122,8 @@
         "type": "object",
         "title": "ConvertOmeZarr"
       },
-      "docs_info": "## convert_ome_zarr\nCreate OME-Zarr plate from MD Image Xpress files.\n\nThis is a non-parallel task => it parses the metadata, creates the plates\nand then converts all the wells in the same process\n"
+      "docs_info": "## convert_ome_zarr\nCreate OME-Zarr plate from MD Image Xpress files.\n\nThis is a non-parallel task => it parses the metadata, creates the plates\nand then converts all the wells in the same process\n",
+      "docs_link": "https://github.com/fractal-analytics-platform/fractal-faim-ipa"
     }
   ],
   "has_args_schemas": true,
