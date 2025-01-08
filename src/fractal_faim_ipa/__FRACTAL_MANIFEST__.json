@@ -10,6 +10,7 @@
         "Image Xpress",
         "MD"
       ],
+      "docs_info": "### Purpose\n- Converts **2D and 3D images from MD Molecular Devices** systems into OME-Zarr format, creating OME-Zarr HCS plates and combining all fields of view in a well into a single image.\n- Saves Fractal **region-of-interest (ROI) tables** for both individual fields of view and the entire well.\n- Handles overlapping fields of view by either fusing images or saving them in grid tiles (depending on the `tile_alignment` option).\n\n### Limitations\n- The `image_dir` needs to be set to the the parent folder containing the following sub-folders: YYYY-MM-DD / Project_ID / Actual image files (potentially in ZStep folders). If it is run directly from the folder containing the images, it will fail.\n",
       "executable_non_parallel": "convert_ome_zarr.py",
       "meta_non_parallel": {
         "cpus_per_task": 8,
@@ -122,7 +123,6 @@
         "type": "object",
         "title": "ConvertOmeZarr"
       },
-      "docs_info": "## convert_ome_zarr\nCreate OME-Zarr plate from MD Image Xpress files.\n\nThis is a non-parallel task => it parses the metadata, creates the plates\nand then converts all the wells in the same process\n",
       "docs_link": "https://github.com/fractal-analytics-platform/fractal-faim-ipa"
     }
   ],

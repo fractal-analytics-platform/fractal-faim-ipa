@@ -10,5 +10,6 @@ TASK_LIST = [
         category="Conversion",
         modality="HCS",
         tags=["Molecular Devices", "Image Xpress", "MD"],
+        docs_info="file:task_info/md_converter.md",
     ),
 ]
