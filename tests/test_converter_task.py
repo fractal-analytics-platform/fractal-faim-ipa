@@ -1,19 +1,36 @@
 # Fractal example scripts
 
 import math
-import tempfile
 from os.path import join
 from pathlib import Path
 
 import anndata as ad
+import pytest
+import zarr
 from fractal_faim_ipa.convert_ome_zarr import convert_ome_zarr
 
 
-def test_ome_zarr_conversion():
+def count_arrays_in_group(group_url: str) -> int:
+    """
+    Count the number of arrays in a Zarr group.
+
+    Parameters:
+    - group_url (str): The URL or path to the Zarr group.
+
+    Returns:
+    - int: The number of arrays in the Zarr group.
+    """
+    group = zarr.open_group(group_url, mode="r")
+    array_count = sum(
+        1 for key, item in group.items() if isinstance(item, zarr.core.Array)
+    )
+    return array_count
+
+
+def test_ome_zarr_conversion(tmp_path):
     ROOT_DIR = Path(__file__).parent
     image_dir = str(join(ROOT_DIR.parent, "resources", "Projection-Mix"))
-    tmp_dir = tempfile.mkdtemp()
-    zarr_root = Path(tmp_dir, "zarr-files")
+    zarr_root = Path(tmp_path, "zarr-files")
     zarr_root.mkdir()
 
     mode = "MD Stack Acquisition"
@@ -131,3 +148,35 @@ def test_ome_zarr_conversion():
         math.isclose(a, b, rel_tol=1e-5)
         for a, b in zip(df_fov.loc["FOV_2"].values.flatten().tolist(), target_values)
     )
+
+
+@pytest.mark.parametrize("num_levels", [2, 5, 8])
+def test_md_converter_pyramid_levels(tmp_path, num_levels):
+    ROOT_DIR = Path(__file__).parent
+    image_dir = str(join(ROOT_DIR.parent, "resources", "Projection-Mix"))
+    zarr_root = Path(tmp_path, "zarr-files")
+    zarr_root.mkdir()
+
+    mode = "MD Stack Acquisition"
+
+    order_name = "example-order"
+    barcode = "example-barcode"
+    overwrite = True
+
+    output_name = "OME-Zarr"
+
+    image_list_update = convert_ome_zarr(
+        zarr_urls=[],
+        zarr_dir=str(zarr_root),
+        image_dir=image_dir,
+        zarr_name=output_name,
+        mode=mode,
+        layout=96,
+        num_levels=num_levels,
+        order_name=order_name,
+        barcode=barcode,
+        overwrite=overwrite,
+    )["image_list_updates"]
+
+    zarr_url = image_list_update[0]["zarr_url"]
+    assert count_arrays_in_group(zarr_url) == num_levels

@@ -39,6 +39,7 @@ def convert_ome_zarr(
     zarr_name: str = "Plate",
     tile_alignment: Literal["StageAlignment", "GridAlignment"] = "GridAlignment",
     layout: Literal[96, 384] = 96,
+    num_levels: int = 5,
     query: str = "",
     order_name: str = "example-order",
     barcode: str = "example-barcode",
@@ -70,6 +71,9 @@ def convert_ome_zarr(
         layout: Plate layout for the Zarr file. Valid options are 96 and 384
         query: Pandas query to filter the file list.
         order_name: Name of the order
+        num_levels: Number of pyramid levels to build in an OME-Zarr. More
+            levels are useful for large plates to allow easier plate
+            visualization, but will also lead to more files being created.
         barcode: Barcode of the plate
         overwrite: Whether to overwrite the zarr file if it already exists
         binning: Binning factor to downsample the original image. If set to 2,
@@ -153,8 +157,8 @@ def convert_ome_zarr(
         plate=plate,
         plate_acquisition=plate_acquisition,
         well_sub_group=well_sub_group,
-        # chunks=(1, 512, 512), # check whether that should be exposed
-        # max_layer=2, # check whether that should be exposed
+        # chunks=(2048, 2048), # check whether that should be exposed
+        max_layer=num_levels - 1,
     )
 
     # Write ROI tables to the images
