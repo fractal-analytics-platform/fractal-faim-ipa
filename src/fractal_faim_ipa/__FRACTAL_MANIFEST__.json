@@ -77,6 +77,12 @@
             "type": "integer",
             "description": "Plate layout for the Zarr file. Valid options are 96 and 384"
           },
+          "num_levels": {
+            "default": 5,
+            "title": "Num Levels",
+            "type": "integer",
+            "description": "Number of pyramid levels to build in an OME-Zarr. More levels are useful for large plates to allow easier plate visualization, but will also lead to more files being created."
+          },
           "query": {
             "default": "",
             "title": "Query",
