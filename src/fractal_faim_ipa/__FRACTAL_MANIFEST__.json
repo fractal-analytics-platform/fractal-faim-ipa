@@ -39,17 +39,13 @@
           },
           "mode": {
             "enum": [
-              "MD Stack Acquisition",
-              "MD Single Plane Acquisition",
-              "MD Mixed Acquisition",
-              "MetaXpress MD Stack Acquisition",
-              "MetaXpress MD Single Plane Acquisition",
-              "MetaXpress MD Single Plane Acquisition as 3D",
-              "MetaXpress MD Mixed Acquisition"
+              "Stack Acquisition",
+              "Single Plane Acquisition",
+              "Mixed Acquisition"
             ],
             "title": "Mode",
             "type": "string",
-            "description": "Choose conversion mode. MetaXpress modes are used when data is exported via MetaXpress. Choose whether you have 3D data (StackAcquisition), 2D data (Single Plane Acquisition) or mixed."
+            "description": "Choose conversion mode. Choose whether you have 3D data (StackAcquisition), 2D data (Single Plane Acquisition) or mixed (Mixed Acquisition)."
           },
           "zarr_name": {
             "default": "Plate",
@@ -82,12 +78,6 @@
             "title": "Num Levels",
             "type": "integer",
             "description": "Number of pyramid levels to build in an OME-Zarr. More levels are useful for large plates to allow easier plate visualization, but will also lead to more files being created."
-          },
-          "query": {
-            "default": "",
-            "title": "Query",
-            "type": "string",
-            "description": "Pandas query to filter the file list."
           },
           "order_name": {
             "default": "example-order",

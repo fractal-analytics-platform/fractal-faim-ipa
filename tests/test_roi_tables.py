@@ -4,12 +4,13 @@ from pathlib import Path
 
 import pytest
 from faim_ipa.hcs.acquisition import TileAlignmentOptions
+
 from fractal_faim_ipa.md_converter_utils import ModeEnum
 from fractal_faim_ipa.roi_tables import _extract_fov_sort_key, create_ROI_tables
 
 
 @pytest.mark.parametrize(
-    "mode", ["MD Stack Acquisition", "MD Single Plane Acquisition"]
+    "mode", ["Stack Acquisition", "Single Plane Acquisition"]
 )
 def test_roi_tables(mode):
     ROOT_DIR = Path(__file__).parent
@@ -75,9 +76,9 @@ def test_roi_tables(mode):
 @pytest.mark.parametrize("alignment", ["StageAlignment"])
 def test_roi_table_overlaps(alignment):
     ROOT_DIR = Path(__file__).parent
-    image_dir = str(join(ROOT_DIR.parent, "resources", "zmb_test_data"))
+    image_dir = str(join(ROOT_DIR.parent, "resources", "zmb-test-data_Plate_0000"))
 
-    mode = ModeEnum.MetaXpressStackAcquisition
+    mode = ModeEnum.StackAcquisition
     plate_acquisition = mode.get_plate_acquisition(
         acquisition_dir=image_dir,
         alignment=TileAlignmentOptions(alignment),
@@ -130,7 +131,7 @@ def test_roi_sorting():
     ROOT_DIR = Path(__file__).parent
     image_dir = str(join(ROOT_DIR.parent, "resources", "Projection-Mix"))
 
-    mode = ModeEnum("MD Stack Acquisition")
+    mode = ModeEnum("Stack Acquisition")
     plate_acquisition = mode.get_plate_acquisition(
         acquisition_dir=image_dir,
         alignment=TileAlignmentOptions.GRID,

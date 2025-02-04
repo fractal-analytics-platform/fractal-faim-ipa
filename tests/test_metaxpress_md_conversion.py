@@ -3,14 +3,14 @@ from pathlib import Path
 
 import dask.array as da
 import pytest
+
 from fractal_faim_ipa.convert_ome_zarr import convert_ome_zarr
 
 ROOT_DIR = Path(__file__).parent
-image_dir = str(join(ROOT_DIR.parent, "resources", "zmb_test_data"))
+image_dir = str(join(ROOT_DIR.parent, "resources", "zmb-test-data_Plate_0000"))
 order_name = "example-order"
 barcode = "example-barcode"
 overwrite = True
-query = ""
 output_name = "Test_ZMB_3D"
 
 
@@ -19,7 +19,7 @@ output_name = "Test_ZMB_3D"
     [("GridAlignment", (2, 2, 4096, 6144)), ("StageAlignment", (2, 2, 3892, 5735))],
 )
 def test_montage(tmp_path, tile_alignment, expected_shape):
-    mode = "MetaXpress MD Stack Acquisition"
+    mode = "Stack Acquisition"
     zarr_root = Path(tmp_path, "zarr-files")
     zarr_root.mkdir()
     convert_ome_zarr(
@@ -29,7 +29,6 @@ def test_montage(tmp_path, tile_alignment, expected_shape):
         zarr_name=output_name,
         mode=mode,
         tile_alignment=tile_alignment,
-        query=query,
         order_name=order_name,
         barcode=barcode,
         overwrite=overwrite,
