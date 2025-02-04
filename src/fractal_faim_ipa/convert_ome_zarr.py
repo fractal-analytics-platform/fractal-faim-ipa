@@ -28,19 +28,14 @@ def convert_ome_zarr(
     # layout: PlateLayout = 96,
     # tile_alignment: TileAlignmentOptions = "GridAlignment",
     mode: Literal[
-        "MD Stack Acquisition",
-        "MD Single Plane Acquisition",
-        "MD Mixed Acquisition",
-        "MetaXpress MD Stack Acquisition",
-        "MetaXpress MD Single Plane Acquisition",
-        "MetaXpress MD Single Plane Acquisition as 3D",
-        "MetaXpress MD Mixed Acquisition",
+        "Stack Acquisition",
+        "Single Plane Acquisition",
+        "Mixed Acquisition",
     ],
     zarr_name: str = "Plate",
     tile_alignment: Literal["StageAlignment", "GridAlignment"] = "GridAlignment",
     layout: Literal[96, 384] = 96,
     num_levels: int = 5,
-    query: str = "",
     order_name: str = "example-order",
     barcode: str = "example-barcode",
     overwrite: bool = False,
@@ -62,14 +57,13 @@ def convert_ome_zarr(
             (standard argument for Fractal tasks, managed by Fractal server).
         image_dir: Path to the folder containing the images to be converted.
         zarr_name: Name of the zarr plate file that will be created
-        mode: Choose conversion mode. MetaXpress modes are used when data is
-            exported via MetaXpress. Choose whether you have 3D data
-            (StackAcquisition), 2D data (Single Plane Acquisition) or mixed.
+        mode: Choose conversion mode. Choose whether you have 3D data
+            (StackAcquisition), 2D data (Single Plane Acquisition) or mixed
+            (Mixed Acquisition).
         tile_alignment: Choose whether tiles are placed into the OME-Zarr as a
             grid or whether they are placed based on the position of field of
             views in the metadata (using fusion for shared areas).
         layout: Plate layout for the Zarr file. Valid options are 96 and 384
-        query: Pandas query to filter the file list.
         order_name: Name of the order
         num_levels: Number of pyramid levels to build in an OME-Zarr. More
             levels are useful for large plates to allow easier plate
@@ -98,14 +92,9 @@ def convert_ome_zarr(
         # Remove zarr if it already exists.
         shutil.rmtree(join(zarr_dir, zarr_name + ".zarr"))
 
-    # Query handling (only implemented in MetaXpress modes)
-    if query == "":
-        query = None
-
     plate_acquisition = mode.get_plate_acquisition(
         acquisition_dir=image_dir,
         alignment=tile_alignment,
-        query=query,
     )
 
     # The automatic distribute.Client option often fails to finish when
@@ -143,11 +132,7 @@ def convert_ome_zarr(
 
     image_list_updates = []
     # TODO: Add more robust handling for dimensionality detection
-    if (
-        mode == ModeEnum.SinglePlaneAcquisition
-        or mode == ModeEnum.MetaXpressSinglePlaneAcquisition
-        or mode == ModeEnum.MetaXpressSinglePlaneAcquisition_as3D
-    ):
+    if mode == ModeEnum.SinglePlaneAcquisition:
         is_3D = False
     else:
         is_3D = True
