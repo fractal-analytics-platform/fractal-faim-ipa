@@ -7,6 +7,7 @@ from pathlib import Path
 import anndata as ad
 import pytest
 import zarr
+
 from fractal_faim_ipa.convert_ome_zarr import convert_ome_zarr
 
 
@@ -33,7 +34,7 @@ def test_ome_zarr_conversion(tmp_path):
     zarr_root = Path(tmp_path, "zarr-files")
     zarr_root.mkdir()
 
-    mode = "MD Stack Acquisition"
+    mode = "Stack Acquisition"
 
     order_name = "example-order"
     barcode = "example-barcode"
@@ -157,7 +158,7 @@ def test_md_converter_pyramid_levels(tmp_path, num_levels):
     zarr_root = Path(tmp_path, "zarr-files")
     zarr_root.mkdir()
 
-    mode = "MD Stack Acquisition"
+    mode = "Stack Acquisition"
 
     order_name = "example-order"
     barcode = "example-barcode"
