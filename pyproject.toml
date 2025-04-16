@@ -38,6 +38,7 @@ dependencies = [
     "pydantic",
     "zarr",
     "faim-ipa==0.11.0",
+    "fractal-task-tools==0.0.12",
 ]
 
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
