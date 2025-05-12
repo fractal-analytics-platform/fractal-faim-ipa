@@ -3,7 +3,6 @@ from pathlib import Path
 
 import dask.array as da
 import pytest
-
 from fractal_faim_ipa.convert_ome_zarr import convert_ome_zarr
 
 ROOT_DIR = Path(__file__).parent
@@ -22,10 +21,18 @@ def test_montage(tmp_path, tile_alignment, expected_shape):
     mode = "Stack Acquisition"
     zarr_root = Path(tmp_path, "zarr-files")
     zarr_root.mkdir()
+
+    acquisitions = [
+        {
+            "path": image_dir,
+            "plate_name": output_name,
+            "acquisition_id": 0,
+        }
+    ]
+
     convert_ome_zarr(
         zarr_dir=str(zarr_root),
-        image_dir=image_dir,
-        zarr_name=output_name,
+        acquisitions=acquisitions,
         mode=mode,
         tile_alignment=tile_alignment,
         order_name=order_name,

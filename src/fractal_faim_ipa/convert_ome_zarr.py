@@ -9,7 +9,7 @@ from faim_ipa.hcs.acquisition import TileAlignmentOptions
 from faim_ipa.hcs.converter import ConvertToNGFFPlate, NGFFPlate, PlateLayout
 from faim_ipa.stitching import stitching_utils
 from fractal_tasks_core.tables import write_table
-from pydantic import validate_call
+from pydantic import BaseModel, Field, validate_call
 
 from fractal_faim_ipa.md_converter_utils import ModeEnum
 from fractal_faim_ipa.roi_tables import create_ROI_tables
@@ -17,11 +17,33 @@ from fractal_faim_ipa.roi_tables import create_ROI_tables
 logger = logging.getLogger(__name__)
 
 
+class AcquisitionInputModel(BaseModel):
+    """Acquisition metadata.
+
+    Based on
+    https://github.com/fractal-analytics-platform/fractal-hcs-converters
+
+    Attributes:
+        path: Path to the acquisition directory. For the MD, this is the folder
+            that contains a date folder and an ID folder. If the images are in
+            /path/to/project_name/2025-05-12/1234, then the path should be
+            /path/to/project_name.
+        plate_name: Optional custom name for the plate. If not provided, the name will
+            be the acquisition directory name.
+        acquisition_id: Acquisition ID,
+            used to identify the acquisition in case of multiple acquisitions.
+    """
+
+    path: str
+    plate_name: str | None = None
+    acquisition_id: int = Field(default=0, ge=0)
+
+
 @validate_call
 def convert_ome_zarr(
     *,
     zarr_dir: str,
-    image_dir: str,
+    acquisitions: list[AcquisitionInputModel],
     # # TODO: Figure out a way to use the Enums directly with working manifest building
     # mode: ModeEnum = "MD Stack Acquisition",
     # layout: PlateLayout = 96,
@@ -31,7 +53,6 @@ def convert_ome_zarr(
         "Single Plane Acquisition",
         "Mixed Acquisition",
     ],
-    zarr_name: str = "Plate",
     tile_alignment: Literal["StageAlignment", "GridAlignment"] = "GridAlignment",
     layout: Literal[96, 384] = 96,
     num_levels: int = 5,
@@ -51,7 +72,11 @@ def convert_ome_zarr(
         zarr_dir: path of the directory where the new OME-Zarrs will be
             created.
             (standard argument for Fractal tasks, managed by Fractal server).
-        image_dir: Path to the folder containing the images to be converted.
+        acquisitions: List of acquisition directories to convert to OME-Zarr. If
+            you are processing multiplexing experiments, name the plate the
+            same for all acquisitions, but give them unique acquisition IDs.
+            If you are processing multiple separate plates, give the plates
+            unique names.
         zarr_name: Name of the zarr plate file that will be created
         mode: Choose conversion mode. Choose whether you have 3D data
             (StackAcquisition), 2D data (Single Plane Acquisition) or mixed
@@ -80,16 +105,20 @@ def convert_ome_zarr(
     tile_alignment = TileAlignmentOptions(tile_alignment)
     zarr_dir = zarr_dir.rstrip("/")
 
+    # TODO: Loop over plates for multiplexing or creating multiple plates
+    plate_name = acquisitions[0].plate_name
+    if plate_name is None:
+        plate_name = acquisitions[0].path.rstrip("/").split("/")[-1]
     # TO REVIEW: Overwrite checks are not exposed in faim-hcs API
     # Unclear how faim-hcs handles rerunning the plate creation
     # (the Zarr file gets a newer timestamp at least)
     # This block triggers a reset
-    if overwrite and exists(join(zarr_dir, zarr_name + ".zarr")):
+    if overwrite and exists(join(zarr_dir, plate_name + ".zarr")):
         # Remove zarr if it already exists.
-        shutil.rmtree(join(zarr_dir, zarr_name + ".zarr"))
+        shutil.rmtree(join(zarr_dir, plate_name + ".zarr"))
 
     plate_acquisition = mode.get_plate_acquisition(
-        acquisition_dir=image_dir,
+        acquisition_dir=acquisitions[0].path,
         alignment=tile_alignment,
     )
 
@@ -107,7 +136,7 @@ def convert_ome_zarr(
     converter = ConvertToNGFFPlate(
         ngff_plate=NGFFPlate(
             root_dir=zarr_dir,
-            name=zarr_name,
+            name=plate_name,
             layout=int(layout),
             order_name=order_name,
             barcode=barcode,
@@ -124,7 +153,7 @@ def convert_ome_zarr(
     well_sub_group = "0"
     well_acquisitions = plate_acquisition.get_well_acquisitions(selection=None)
 
-    plate_name = zarr_name + ".zarr"
+    full_plate_name = plate_name + ".zarr"
 
     image_list_updates = []
     # TODO: Add more robust handling for dimensionality detection
@@ -161,12 +190,15 @@ def convert_ome_zarr(
 
         # Create the metadata dictionary: needs a list of all the images
         well_id = f"{well_rc[0]}{well_rc[1]}"
-        zarr_url = f"{zarr_dir}/{plate_name}/{well_rc[0]}/{well_rc[1]}/{well_sub_group}"
+        zarr_url = (
+            f"{zarr_dir}/{full_plate_name}/{well_rc[0]}/"
+            f"{well_rc[1]}/{well_sub_group}"
+        )
         image_list_updates.append(
             {
                 "zarr_url": zarr_url,
                 "attributes": {
-                    "plate": plate_name,
+                    "plate": full_plate_name,
                     "well": well_id,
                 },
                 "types": {"is_3D": is_3D},

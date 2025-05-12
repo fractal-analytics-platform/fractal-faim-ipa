@@ -7,7 +7,6 @@ from pathlib import Path
 import anndata as ad
 import pytest
 import zarr
-
 from fractal_faim_ipa.convert_ome_zarr import convert_ome_zarr
 
 
@@ -30,7 +29,14 @@ def count_arrays_in_group(group_url: str) -> int:
 
 def test_ome_zarr_conversion(tmp_path):
     ROOT_DIR = Path(__file__).parent
-    image_dir = str(join(ROOT_DIR.parent, "resources", "Projection-Mix"))
+    output_name = "OME-Zarr"
+    acquisitions = [
+        {
+            "path": str(join(ROOT_DIR.parent, "resources", "Projection-Mix")),
+            "plate_name": output_name,
+            "acquisition_id": 0,
+        }
+    ]
     zarr_root = Path(tmp_path, "zarr-files")
     zarr_root.mkdir()
 
@@ -40,12 +46,9 @@ def test_ome_zarr_conversion(tmp_path):
     barcode = "example-barcode"
     overwrite = True
 
-    output_name = "OME-Zarr"
-
     image_list_update = convert_ome_zarr(
         zarr_dir=str(zarr_root),
-        image_dir=image_dir,
-        zarr_name=output_name,
+        acquisitions=acquisitions,
         mode=mode,
         layout=96,
         order_name=order_name,
@@ -153,7 +156,14 @@ def test_ome_zarr_conversion(tmp_path):
 @pytest.mark.parametrize("num_levels", [2, 5, 8])
 def test_md_converter_pyramid_levels(tmp_path, num_levels):
     ROOT_DIR = Path(__file__).parent
-    image_dir = str(join(ROOT_DIR.parent, "resources", "Projection-Mix"))
+    output_name = "OME-Zarr"
+    acquisitions = [
+        {
+            "path": str(join(ROOT_DIR.parent, "resources", "Projection-Mix")),
+            "plate_name": output_name,
+            "acquisition_id": 0,
+        }
+    ]
     zarr_root = Path(tmp_path, "zarr-files")
     zarr_root.mkdir()
 
@@ -163,12 +173,9 @@ def test_md_converter_pyramid_levels(tmp_path, num_levels):
     barcode = "example-barcode"
     overwrite = True
 
-    output_name = "OME-Zarr"
-
     image_list_update = convert_ome_zarr(
         zarr_dir=str(zarr_root),
-        image_dir=image_dir,
-        zarr_name=output_name,
+        acquisitions=acquisitions,
         mode=mode,
         layout=96,
         num_levels=num_levels,
@@ -179,3 +186,39 @@ def test_md_converter_pyramid_levels(tmp_path, num_levels):
 
     zarr_url = image_list_update[0]["zarr_url"]
     assert count_arrays_in_group(zarr_url) == num_levels
+
+
+def test_ome_zarr_conversion_multiplex(tmp_path):
+    ROOT_DIR = Path(__file__).parent
+    output_name = "OME-Zarr"
+    acquisitions = [
+        {
+            "path": str(join(ROOT_DIR.parent, "resources", "Projection-Mix")),
+            "plate_name": output_name,
+            "acquisition_id": 0,
+        },
+        {
+            "path": str(join(ROOT_DIR.parent, "resources", "Projection-Mix")),
+            "plate_name": output_name,
+            "acquisition_id": 1,
+        },
+    ]
+    zarr_root = Path(tmp_path, "zarr-files")
+    zarr_root.mkdir()
+
+    mode = "Stack Acquisition"
+
+    order_name = "example-order"
+    barcode = "example-barcode"
+    overwrite = True
+
+    convert_ome_zarr(
+        zarr_dir=str(zarr_root),
+        acquisitions=acquisitions,
+        mode=mode,
+        layout=96,
+        order_name=order_name,
+        barcode=barcode,
+        overwrite=overwrite,
+    )["image_list_updates"]
+    print(zarr_root)
