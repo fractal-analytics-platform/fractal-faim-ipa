@@ -18,7 +18,7 @@ name = "fractal-faim-ipa"
 dynamic = ["version"]
 description = "Provides Fractal tasks for the MD to OME-Zarr conversion of faim-ipa"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "BSD-3-Clause" }
 authors = [
     { name = "Joel Luethi", email = "joel.luethi@uzh.ch" },
@@ -26,7 +26,6 @@ authors = [
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     # "License :: OSI Approved :: BSD License",
@@ -34,10 +33,11 @@ classifiers = [
 ]
 
 dependencies = [
-    "fractal-tasks-core==1.4.0",
+    "fractal-tasks-core==1.5.0",
     "pydantic",
     "zarr",
     "faim-ipa==0.11.0",
+    "fractal-task-tools==0.0.12",
 ]
 
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies

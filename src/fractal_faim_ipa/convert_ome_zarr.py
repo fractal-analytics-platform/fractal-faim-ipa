@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 @validate_call
 def convert_ome_zarr(
     *,
-    zarr_urls: list[str],
     zarr_dir: str,
     image_dir: str,
     # # TODO: Figure out a way to use the Enums directly with working manifest building
@@ -49,9 +48,6 @@ def convert_ome_zarr(
     and then converts all the wells in the same process
 
     Args:
-        zarr_urls: List of paths or urls to the individual OME-Zarr image to
-            be processed. Not used by the converter task.
-            (standard argument for Fractal tasks, managed by Fractal server).
         zarr_dir: path of the directory where the new OME-Zarrs will be
             created.
             (standard argument for Fractal tasks, managed by Fractal server).
@@ -181,7 +177,7 @@ def convert_ome_zarr(
 
 
 if __name__ == "__main__":
-    from fractal_tasks_core.tasks._utils import run_fractal_task
+    from fractal_task_tools.task_wrapper import run_fractal_task
 
     run_fractal_task(
         task_function=convert_ome_zarr,

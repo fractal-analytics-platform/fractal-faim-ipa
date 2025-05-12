@@ -1,9 +1,10 @@
 """Fractal Task list for Fractal Helper Tasks."""
 
-from fractal_tasks_core.dev.task_models import NonParallelTask
+from fractal_task_tools.task_models import ConverterNonParallelTask
 
+DOCS_LINK = "https://github.com/fractal-analytics-platform/fractal-faim-ipa"
 TASK_LIST = [
-    NonParallelTask(
+    ConverterNonParallelTask(
         name="FAIM IPA OME-Zarr Converter",
         executable="convert_ome_zarr.py",
         meta={"cpus_per_task": 8, "mem": 32000},

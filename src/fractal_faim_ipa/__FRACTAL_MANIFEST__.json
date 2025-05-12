@@ -11,6 +11,7 @@
         "MD"
       ],
       "docs_info": "### Purpose\n- Converts **2D and 3D images from MD Molecular Devices** systems into OME-Zarr format, creating OME-Zarr HCS plates and combining all fields of view in a well into a single image.\n- Saves Fractal **region-of-interest (ROI) tables** for both individual fields of view and the entire well.\n- Handles overlapping fields of view by either fusing images or saving them in grid tiles (depending on the `tile_alignment` option).\n\n### Limitations\n- The `image_dir` needs to be set to the the parent folder containing the following sub-folders: YYYY-MM-DD / Project_ID / Actual image files (potentially in ZStep folders). If it is run directly from the folder containing the images, it will fail.\n",
+      "type": "converter_non_parallel",
       "executable_non_parallel": "convert_ome_zarr.py",
       "meta_non_parallel": {
         "cpus_per_task": 8,
@@ -19,14 +20,6 @@
       "args_schema_non_parallel": {
         "additionalProperties": false,
         "properties": {
-          "zarr_urls": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Zarr Urls",
-            "type": "array",
-            "description": "List of paths or urls to the individual OME-Zarr image to be processed. Not used by the converter task. (standard argument for Fractal tasks, managed by Fractal server)."
-          },
           "zarr_dir": {
             "title": "Zarr Dir",
             "type": "string",
@@ -111,7 +104,6 @@
           }
         },
         "required": [
-          "zarr_urls",
           "zarr_dir",
           "image_dir",
           "mode"
@@ -123,5 +115,6 @@
     }
   ],
   "has_args_schemas": true,
-  "args_schema_version": "pydantic_v2"
+  "args_schema_version": "pydantic_v2",
+  "authors": null
 }

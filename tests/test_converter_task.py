@@ -43,7 +43,6 @@ def test_ome_zarr_conversion(tmp_path):
     output_name = "OME-Zarr"
 
     image_list_update = convert_ome_zarr(
-        zarr_urls=[],
         zarr_dir=str(zarr_root),
         image_dir=image_dir,
         zarr_name=output_name,
@@ -167,7 +166,6 @@ def test_md_converter_pyramid_levels(tmp_path, num_levels):
     output_name = "OME-Zarr"
 
     image_list_update = convert_ome_zarr(
-        zarr_urls=[],
         zarr_dir=str(zarr_root),
         image_dir=image_dir,
         zarr_name=output_name,

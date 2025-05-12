@@ -37,7 +37,6 @@ output_name = "OME-Zarr-Test"
 
 # metatada_update
 md_create_ome_zarr(
-    zarr_urls=[],
     zarr_dir=str(zarr_root),
     image_dir=image_dir,
     zarr_name=output_name,

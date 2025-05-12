@@ -23,7 +23,6 @@ def test_montage(tmp_path, tile_alignment, expected_shape):
     zarr_root = Path(tmp_path, "zarr-files")
     zarr_root.mkdir()
     convert_ome_zarr(
-        zarr_urls=[],
         zarr_dir=str(zarr_root),
         image_dir=image_dir,
         zarr_name=output_name,
