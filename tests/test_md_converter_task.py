@@ -54,7 +54,6 @@ def test_ome_zarr_conversion_simple(tmp_path):
         barcode=barcode,
         reset_plates=reset_plates,
     )["image_list_updates"]
-    print(image_list_update)
     expected_image_list_update = [
         {
             "zarr_url": f"{zarr_root}/{output_name}.zarr/E/07/0",

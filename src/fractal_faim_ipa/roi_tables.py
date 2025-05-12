@@ -7,7 +7,10 @@ from faim_ipa.hcs.acquisition import PlateAcquisition, WellAcquisition
 from faim_ipa.stitching.tile import Tile
 
 
-def create_ROI_tables(plate_acquisition: PlateAcquisition):
+def create_ROI_tables(
+    plate_acquisition: PlateAcquisition,
+    mode="MD",
+):
     """Generate ROI tables for all images in a plate."""
     columns = [
         "FieldIndex",
@@ -35,6 +38,7 @@ def create_ROI_tables(plate_acquisition: PlateAcquisition):
                 well_acquisition.get_tiles(),
                 columns,
                 pixel_size_zyx,
+                mode=mode,
             ),
             "well_ROI_table": create_well_ROI_table(
                 well_acquisition,
@@ -70,19 +74,30 @@ def create_well_ROI_table(
 
 
 def create_fov_ROI_table(
-    tiles: list[Tile], columns: list[str], pixel_size_zyx: list[float]
+    tiles: list[Tile],
+    columns: list[str],
+    pixel_size_zyx: list[float],
+    mode="MD",
 ):
-    """Generate a FOV ROI table based on the position of the tiles."""
+    """Generate a FOV ROI table based on the position of the tiles.
+
+    Supports MD & CV mode
+    """
     fov_rois = []
     tile = tiles[0]
     min_z = tile.position.z * pixel_size_zyx[0]
     max_z = (tile.position.z + 1) * pixel_size_zyx[0]
     fov_counter = 1
     # Initial robust sort based on full file paths
-    sorted_tiles = sorted(tiles, key=lambda tile: tile.path)
-    # Sort again by trying to find site information as usually contained in
-    # MD filenames
-    sorted_tiles = sorted(sorted_tiles, key=_extract_fov_sort_key)
+    if mode == "MD":
+        sorted_tiles = sorted(tiles, key=lambda tile: tile.path)
+        # Sort again by trying to find site information as usually contained in
+        # MD filenames
+        sorted_tiles = sorted(sorted_tiles, key=_extract_fov_sort_key)
+    elif mode == "CV":
+        # It looks like CV tiles don't need extra sorting. If they do need it,
+        # check here
+        sorted_tiles = tiles
     for tile in sorted_tiles:
         z_start = tile.position.z * pixel_size_zyx[0]
         z_end = (tile.position.z + 1) * pixel_size_zyx[0]
