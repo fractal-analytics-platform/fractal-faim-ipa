@@ -33,7 +33,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "fractal-tasks-core==1.5.0a1",
+    "fractal-tasks-core==1.5.0",
     "pydantic",
     "zarr",
     "faim-ipa==0.11.0",
