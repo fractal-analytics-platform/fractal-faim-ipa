@@ -9,7 +9,7 @@ ROOT_DIR = Path(__file__).parent
 image_dir = str(join(ROOT_DIR.parent, "resources", "zmb-test-data_Plate_0000"))
 order_name = "example-order"
 barcode = "example-barcode"
-overwrite = True
+reset_plates = True
 output_name = "Test_ZMB_3D"
 
 
@@ -37,7 +37,7 @@ def test_montage(tmp_path, tile_alignment, expected_shape):
         tile_alignment=tile_alignment,
         order_name=order_name,
         barcode=barcode,
-        overwrite=overwrite,
+        reset_plates=reset_plates,
     )
     print(zarr_root)
     print(f"{zarr_root!s}/{output_name}.zarr/C/03/0/0")
