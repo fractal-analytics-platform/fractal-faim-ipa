@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 @validate_call
-def convert_ome_zarr(  # noqa: C901
+def convert_md_to_ome_zarr(  # noqa: C901
     *,
     zarr_dir: str,
     acquisitions: list[AcquisitionInputModel],
@@ -221,6 +221,6 @@ if __name__ == "__main__":
     from fractal_task_tools.task_wrapper import run_fractal_task
 
     run_fractal_task(
-        task_function=convert_ome_zarr,
+        task_function=convert_md_to_ome_zarr,
         logger_name=logger.name,
     )

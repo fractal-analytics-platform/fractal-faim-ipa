@@ -8,8 +8,8 @@ INPUT_MODELS = [
 ]
 TASK_LIST = [
     ConverterNonParallelTask(
-        name="MD to OME-Zarr Converter",
-        executable="convert_ome_zarr.py",
+        name="Convert MD to OME-Zarr",
+        executable="convert_md_to_ome_zarr.py",
         meta={"cpus_per_task": 8, "mem": 32000},
         category="Conversion",
         modality="HCS",
@@ -17,8 +17,8 @@ TASK_LIST = [
         docs_info="file:task_info/md_converter.md",
     ),
     ConverterNonParallelTask(
-        name="Cellvoyager to OME-Zarr Converter",
-        executable="convert_ome_zarr.py",
+        name="FAIM-IPA Convert Cellvoyager to OME-Zarr",
+        executable="convert_cellvoyager_to_ome_zarr.py",
         meta={"cpus_per_task": 8, "mem": 32000},
         category="Conversion",
         modality="HCS",

@@ -1,7 +1,9 @@
 from os.path import join
 from pathlib import Path
 
-from fractal_faim_ipa.convert_cellvoyager_ome_zarr import convert_cellvoyager_ome_zarr
+from fractal_faim_ipa.convert_cellvoyager_to_ome_zarr import (
+    convert_cellvoyager_to_ome_zarr,
+)
 
 
 def test_ome_zarr_conversion_simple(tmp_path):
@@ -28,7 +30,7 @@ def test_ome_zarr_conversion_simple(tmp_path):
     barcode = "example-barcode"
     reset_plates = True
 
-    image_list_update = convert_cellvoyager_ome_zarr(
+    image_list_update = convert_cellvoyager_to_ome_zarr(
         zarr_dir=str(zarr_root),
         acquisitions=acquisitions,
         layout=96,

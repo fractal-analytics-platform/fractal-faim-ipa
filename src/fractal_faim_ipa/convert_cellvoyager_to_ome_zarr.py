@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 @validate_call
-def convert_cellvoyager_ome_zarr(  # noqa: C901
+def convert_cellvoyager_to_ome_zarr(  # noqa: C901
     *,
     zarr_dir: str,
     acquisitions: list[AcquisitionInputModel],
@@ -184,6 +184,7 @@ def convert_cellvoyager_ome_zarr(  # noqa: C901
             plate_acquisition=plate_acquisition,
             well_sub_group=well_sub_group,
             # TODO: Expose this to user  more fine-grained?
+            # FIXME: If 2D data is received, is a Z singleton included?
             chunks=(z_chunking, 2160, 2560),
             max_layer=num_levels - 1,
         )
@@ -237,6 +238,6 @@ if __name__ == "__main__":
     from fractal_task_tools.task_wrapper import run_fractal_task
 
     run_fractal_task(
-        task_function=convert_cellvoyager_ome_zarr,
+        task_function=convert_cellvoyager_to_ome_zarr,
         logger_name=logger.name,
     )
