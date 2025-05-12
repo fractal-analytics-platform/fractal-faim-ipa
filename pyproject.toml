@@ -36,7 +36,7 @@ dependencies = [
     "fractal-tasks-core==1.5.0",
     "pydantic",
     "zarr",
-    "faim-ipa==0.11.0",
+    "faim-ipa==0.13.0",
     "fractal-task-tools==0.0.12",
 ]
 
