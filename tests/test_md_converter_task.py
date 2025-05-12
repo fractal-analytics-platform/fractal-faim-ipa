@@ -7,7 +7,7 @@ from pathlib import Path
 import anndata as ad
 import pytest
 import zarr
-from fractal_faim_ipa.convert_ome_zarr import convert_ome_zarr
+from fractal_faim_ipa.convert_md_to_ome_zarr import convert_md_to_ome_zarr
 
 
 def count_arrays_in_group(group_url: str) -> int:
@@ -45,7 +45,7 @@ def test_ome_zarr_conversion_simple(tmp_path):
     barcode = "example-barcode"
     reset_plates = True
 
-    image_list_update = convert_ome_zarr(
+    image_list_update = convert_md_to_ome_zarr(
         zarr_dir=str(zarr_root),
         acquisitions=acquisitions,
         mode=mode,
@@ -54,7 +54,6 @@ def test_ome_zarr_conversion_simple(tmp_path):
         barcode=barcode,
         reset_plates=reset_plates,
     )["image_list_updates"]
-    print(image_list_update)
     expected_image_list_update = [
         {
             "zarr_url": f"{zarr_root}/{output_name}.zarr/E/07/0",
@@ -181,7 +180,7 @@ def test_md_converter_pyramid_levels(tmp_path, num_levels):
     barcode = "example-barcode"
     reset_plates = True
 
-    image_list_update = convert_ome_zarr(
+    image_list_update = convert_md_to_ome_zarr(
         zarr_dir=str(zarr_root),
         acquisitions=acquisitions,
         mode=mode,
@@ -220,7 +219,7 @@ def test_ome_zarr_conversion_multiplex(tmp_path):
     barcode = "example-barcode"
     reset_plates = True
 
-    image_list_update = convert_ome_zarr(
+    image_list_update = convert_md_to_ome_zarr(
         zarr_dir=str(zarr_root),
         acquisitions=acquisitions,
         mode=mode,
@@ -301,7 +300,7 @@ def test_ome_zarr_conversion_multi_plate(tmp_path):
     barcode = "example-barcode"
     reset_plates = True
 
-    image_list_update = convert_ome_zarr(
+    image_list_update = convert_md_to_ome_zarr(
         zarr_dir=str(zarr_root),
         acquisitions=acquisitions,
         mode=mode,

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import dask.array as da
 import pytest
-from fractal_faim_ipa.convert_ome_zarr import convert_ome_zarr
+from fractal_faim_ipa.convert_md_to_ome_zarr import convert_md_to_ome_zarr
 
 ROOT_DIR = Path(__file__).parent
 image_dir = str(join(ROOT_DIR.parent, "resources", "zmb-test-data_Plate_0000"))
@@ -30,7 +30,7 @@ def test_montage(tmp_path, tile_alignment, expected_shape):
         }
     ]
 
-    convert_ome_zarr(
+    convert_md_to_ome_zarr(
         zarr_dir=str(zarr_root),
         acquisitions=acquisitions,
         mode=mode,
