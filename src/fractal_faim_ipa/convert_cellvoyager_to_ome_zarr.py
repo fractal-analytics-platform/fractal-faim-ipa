@@ -109,6 +109,9 @@ def convert_cellvoyager_to_ome_zarr(  # noqa: C901
     # (the Zarr file gets a newer timestamp at least)
     # This block triggers a reset
     for acquisition in acquisitions:
+        plate_name = acquisition.plate_name
+        if plate_name is None:
+            plate_name = acquisition.path.rstrip("/").split("/")[-1]
         if exists(join(zarr_dir, acquisition.plate_name + ".zarr")):
             if reset_plates:
                 # Remove zarr if it already exists.
