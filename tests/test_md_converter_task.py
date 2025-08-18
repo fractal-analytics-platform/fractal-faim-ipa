@@ -160,6 +160,59 @@ def test_ome_zarr_conversion_simple(tmp_path):
     )
 
 
+def test_ome_zarr_conversion_md_no_plate_name(tmp_path):
+    ROOT_DIR = Path(__file__).parent
+    acquisitions = [
+        {
+            "path": str(join(ROOT_DIR.parent, "resources", "Projection-Mix")),
+        }
+    ]
+    zarr_root = Path(tmp_path, "zarr-files")
+    zarr_root.mkdir()
+
+    mode = "Stack Acquisition"
+
+    order_name = "example-order"
+    barcode = "example-barcode"
+    reset_plates = True
+
+    image_list_update = convert_md_to_ome_zarr(
+        zarr_dir=str(zarr_root),
+        acquisitions=acquisitions,
+        mode=mode,
+        layout=96,
+        order_name=order_name,
+        barcode=barcode,
+        reset_plates=reset_plates,
+    )["image_list_updates"]
+    expected_image_list_update = [
+        {
+            "zarr_url": f"{zarr_root}/Projection-Mix.zarr/E/07/0",
+            "attributes": {
+                "plate": "Projection-Mix.zarr",
+                "well": "E07",
+                "acquisition": 0,
+            },
+            "types": {
+                "is_3D": True,
+            },
+        },
+        {
+            "zarr_url": f"{zarr_root}/Projection-Mix.zarr/E/08/0",
+            "attributes": {
+                "plate": "Projection-Mix.zarr",
+                "well": "E08",
+                "acquisition": 0,
+            },
+            "types": {
+                "is_3D": True,
+            },
+        },
+    ]
+    image_list_update.sort(key=lambda x: x["zarr_url"])
+    assert expected_image_list_update == image_list_update
+
+
 @pytest.mark.parametrize("num_levels", [2, 5, 8])
 def test_md_converter_pyramid_levels(tmp_path, num_levels):
     ROOT_DIR = Path(__file__).parent
