@@ -109,13 +109,16 @@ def convert_cellvoyager_to_ome_zarr(  # noqa: C901
     # (the Zarr file gets a newer timestamp at least)
     # This block triggers a reset
     for acquisition in acquisitions:
-        if exists(join(zarr_dir, acquisition.plate_name + ".zarr")):
+        plate_name = acquisition.plate_name
+        if plate_name is None:
+            plate_name = acquisition.path.rstrip("/").split("/")[-1]
+        if exists(join(zarr_dir, plate_name + ".zarr")):
             if reset_plates:
                 # Remove zarr if it already exists.
-                shutil.rmtree(join(zarr_dir, acquisition.plate_name + ".zarr"))
+                shutil.rmtree(join(zarr_dir, plate_name + ".zarr"))
             else:
                 logger.warning(
-                    f"Zarr file {acquisition.plate_name + '.zarr'} already "
+                    f"Zarr file {plate_name + '.zarr'} already "
                     f"exists and wasn't reset due to {reset_plates=}. This "
                     "may lead to unexpected behavior.",
                 )
