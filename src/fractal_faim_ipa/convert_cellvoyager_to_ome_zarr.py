@@ -112,6 +112,17 @@ def convert_cellvoyager_to_ome_zarr(  # noqa: C901
         plate_name = acquisition.plate_name
         if plate_name is None:
             plate_name = acquisition.path.rstrip("/").split("/")[-1]
+
+        # Check if folder exists. faim-ipa errors when wrong paths are
+        # entered are often confusing to users. Fail early if an input path
+        # doesn't even exist / isn't accessible.
+        if not exists(acquisition.path):
+            raise FileNotFoundError(
+                f"Acquisition path {acquisition.path} does not exist or "
+                "is not accessible. Make sure you specify the path in a "
+                "manner that is accessible from where the task is run."
+            )
+
         if exists(join(zarr_dir, plate_name + ".zarr")):
             if reset_plates:
                 # Remove zarr if it already exists.
