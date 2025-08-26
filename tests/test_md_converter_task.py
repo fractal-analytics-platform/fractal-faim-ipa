@@ -393,3 +393,32 @@ def test_ome_zarr_conversion_multi_plate(tmp_path):
         },
     ]
     assert expected_image_list_update == image_list_update
+
+
+def test_ome_zarr_conversion_failure_non_existing_path(tmp_path):
+    output_name = "OME-Zarr"
+    acquisitions = [
+        {
+            "path": "/path/that/does/not/exist",
+            "plate_name": output_name,
+        }
+    ]
+    zarr_root = Path(tmp_path, "zarr-files")
+    zarr_root.mkdir()
+
+    mode = "Stack Acquisition"
+
+    order_name = "example-order"
+    barcode = "example-barcode"
+    reset_plates = True
+
+    with pytest.raises(FileNotFoundError):
+        convert_md_to_ome_zarr(
+            zarr_dir=str(zarr_root),
+            acquisitions=acquisitions,
+            mode=mode,
+            layout=96,
+            order_name=order_name,
+            barcode=barcode,
+            reset_plates=reset_plates,
+        )
