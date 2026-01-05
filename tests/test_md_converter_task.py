@@ -327,6 +327,8 @@ def test_ome_zarr_conversion_multiplex(tmp_path):
             },
         },
     ]
+    image_list_update.sort(key=lambda x: x["zarr_url"])
+    expected_image_list_update.sort(key=lambda x: x["zarr_url"])
     assert expected_image_list_update == image_list_update
 
 
@@ -392,6 +394,8 @@ def test_ome_zarr_conversion_multi_plate(tmp_path):
             },
         },
     ]
+    image_list_update.sort(key=lambda x: x["zarr_url"])
+    expected_image_list_update.sort(key=lambda x: x["zarr_url"])
     assert expected_image_list_update == image_list_update
 
 
