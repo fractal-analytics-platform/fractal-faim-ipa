@@ -69,7 +69,7 @@ def create_well_ROI_table(
     well_roi_table.columns = columns
     well_roi_table.set_index("FieldIndex", inplace=True)
     # Cast the values to float to avoid anndata type issues
-    well_roi_table = well_roi_table.astype(np.float32)
+    well_roi_table = well_roi_table.astype(np.float64)
     return ad.AnnData(well_roi_table)
 
 
@@ -125,7 +125,7 @@ def create_fov_ROI_table(
     roi_table["z_micrometer"] = min_z
     roi_table["len_z_micrometer"] = max_z
     # Cast the values to float to avoid anndata type issues
-    roi_table = roi_table.astype(np.float32)
+    roi_table = roi_table.astype(np.float64)
     return ad.AnnData(roi_table)
 
 
