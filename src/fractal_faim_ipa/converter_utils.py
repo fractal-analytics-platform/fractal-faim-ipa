@@ -13,8 +13,11 @@ class AcquisitionInputModel(BaseModel):
             that contains a date folder and an ID folder. If the images are in
             /path/to/project_name/2025-05-12/1234, then the path should be
             /path/to/project_name.
-        plate_name: Optional custom name for the plate. If not provided, the name will
-            be the acquisition directory name.
+        plate_name: Optional custom name for the plate. If not provided,
+            the name will be the acquisition directory name. For multiplexing,
+            all plates need to be set to have the same plate name. For
+            non-multiplexing (e.g. processing a series of plate), all plates
+            need to have unique names.
         acquisition_id: Acquisition ID,
             used to identify the acquisition in case of multiple acquisitions.
     """
@@ -68,21 +71,38 @@ def check_is_multiplexing(acquisitions: list[AcquisitionInputModel]):
     plate_names = [acquisition.plate_name for acquisition in acquisitions]
     acquisition_ids = [acquisition.acquisition_id for acquisition in acquisitions]
 
-    if len(plate_names) == 0:
+    if len(acquisitions) == 0:
         raise ValueError("No plate acquisitions provided. Please check your input.")
-
-    if len(plate_names) == 1:
+    elif len(acquisitions) == 1:
         return False
-    if len(set(plate_names)) == 1:
-        # All the same plate name
-        if len(set(acquisition_ids)) == len(acquisition_ids):
-            # All the acquisition IDs are unique
+    else:
+        # Cases with more than 1 acquisiton specified
+        if len(set(plate_names)) == len(acquisitions):
+            # Unique plate names => non-multiplexing
+            return False
+        elif len(set(plate_names)) > 1 and len(set(plate_names)) < len(acquisitions):
+            if len(set(acquisition_ids)) == len(acquisitions):
+                raise ValueError(
+                    "Inconsistent plate names for multiplexing experiments. "
+                    "All plate names should be the same for multiplexing.",
+                )
+            else:
+                raise ValueError(
+                    "Inconsistent plate names & acquisition IDs were provided. "
+                    "Either all plate names need to be unique (for "
+                    "non-multiplexing) or all plate names need to be the same "
+                    "but with unique acquisition Ids.",
+                )
+        elif len(set(plate_names)) == 1 and len(set(acquisition_ids)) == len(
+            acquisitions
+        ):
+            # All same plate name & unique acquisition IDs => multiplexing
             return True
         else:
             raise ValueError(
-                "Acquisition IDs should be unique for multiplexing "
-                "experiments. Please check your input.",
+                "Acquisition plate names & IDs are not valid. Please check "
+                "your input."
+                "Either all plate names need to be unique (for "
+                "non-multiplexing) or all plate names need to be the same "
+                "but with unique acquisition Ids."
             )
-    else:
-        # All the plate names are different
-        return False

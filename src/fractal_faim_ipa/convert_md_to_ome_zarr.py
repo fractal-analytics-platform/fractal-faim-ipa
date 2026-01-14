@@ -89,6 +89,10 @@ def convert_md_to_ome_zarr(  # noqa: C901
     zarr_dir = zarr_dir.rstrip("/")
     image_list_updates = []
 
+    for acquisition in acquisitions:
+        if acquisition.plate_name is None:
+            acquisition.plate_name = acquisition.path.rstrip("/").split("/")[-1]
+
     is_multiplexed = check_is_multiplexing(acquisitions)
     if is_multiplexed:
         logger.info(
@@ -104,10 +108,6 @@ def convert_md_to_ome_zarr(  # noqa: C901
     # (the Zarr file gets a newer timestamp at least)
     # This block triggers a reset
     for acquisition in acquisitions:
-        plate_name = acquisition.plate_name
-        if plate_name is None:
-            plate_name = acquisition.path.rstrip("/").split("/")[-1]
-
         # Check if folder exists. faim-ipa errors when wrong paths are
         # entered are often confusing to users. Fail early if an input path
         # doesn't even exist / isn't accessible.
@@ -118,13 +118,13 @@ def convert_md_to_ome_zarr(  # noqa: C901
                 "manner that is accessible from where the task is run."
             )
 
-        if exists(join(zarr_dir, plate_name + ".zarr")):
+        if exists(join(zarr_dir, acquisition.plate_name + ".zarr")):
             if reset_plates:
                 # Remove zarr if it already exists.
-                shutil.rmtree(join(zarr_dir, plate_name + ".zarr"))
+                shutil.rmtree(join(zarr_dir, acquisition.plate_name + ".zarr"))
             else:
                 logger.warning(
-                    f"Zarr file {plate_name + '.zarr'} already "
+                    f"Zarr file {acquisition.plate_name + '.zarr'} already "
                     f"exists and wasn't reset due to {reset_plates=}. This "
                     "may lead to unexpected behavior.",
                 )
@@ -141,10 +141,6 @@ def convert_md_to_ome_zarr(  # noqa: C901
         )
 
     for acquisition in acquisitions:
-        plate_name = acquisition.plate_name
-        if plate_name is None:
-            plate_name = acquisition.path.rstrip("/").split("/")[-1]
-
         plate_acquisition = mode.get_plate_acquisition(
             acquisition_dir=acquisition.path,
             alignment=tile_alignment,
@@ -153,7 +149,7 @@ def convert_md_to_ome_zarr(  # noqa: C901
         converter = ConvertToNGFFPlate(
             ngff_plate=NGFFPlate(
                 root_dir=zarr_dir,
-                name=plate_name,
+                name=acquisition.plate_name,
                 layout=int(layout),
                 order_name=order_name,
                 barcode=barcode,
@@ -169,7 +165,7 @@ def convert_md_to_ome_zarr(  # noqa: C901
         well_sub_group = str(acquisition.acquisition_id)
         well_acquisitions = plate_acquisition.get_well_acquisitions(selection=None)
 
-        full_plate_name = plate_name + ".zarr"
+        full_plate_name = acquisition.plate_name + ".zarr"
 
         # TODO: Add more robust handling for dimensionality detection
         if mode == ModeEnum.SinglePlaneAcquisition:
