@@ -14,6 +14,10 @@ from fractal_faim_ipa.converter_utils import (
 )
 
 
+def sort_key(item):
+    return item["zarr_url"]
+
+
 def count_arrays_in_group(group_url: str) -> int:
     """
     Count the number of arrays in a Zarr group.
@@ -331,7 +335,10 @@ def test_ome_zarr_conversion_multiplex(tmp_path):
             },
         },
     ]
-    assert expected_image_list_update == image_list_update
+
+    assert sorted(image_list_update, key=sort_key) == sorted(
+        expected_image_list_update, key=sort_key
+    )
 
 
 def test_ome_zarr_conversion_multi_plate(tmp_path):
@@ -396,7 +403,9 @@ def test_ome_zarr_conversion_multi_plate(tmp_path):
             },
         },
     ]
-    assert expected_image_list_update == image_list_update
+    assert sorted(image_list_update, key=sort_key) == sorted(
+        expected_image_list_update, key=sort_key
+    )
 
 
 def test_ome_zarr_conversion_failure_non_existing_path(tmp_path):
