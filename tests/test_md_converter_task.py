@@ -8,6 +8,10 @@ import anndata as ad
 import pytest
 import zarr
 from fractal_faim_ipa.convert_md_to_ome_zarr import convert_md_to_ome_zarr
+from fractal_faim_ipa.converter_utils import (
+    AcquisitionInputModel,
+    check_is_multiplexing,
+)
 
 
 def count_arrays_in_group(group_url: str) -> int:
@@ -422,3 +426,66 @@ def test_ome_zarr_conversion_failure_non_existing_path(tmp_path):
             barcode=barcode,
             reset_plates=reset_plates,
         )
+
+
+acquisitions = {
+    "multiplexing": [
+        [
+            AcquisitionInputModel(
+                path="/path/to/plate1", plate_name="plate1", acquisition_id=1
+            ),
+            AcquisitionInputModel(
+                path="/path/to/plate2", plate_name="plate1", acquisition_id=2
+            ),
+        ],
+    ],
+    "multi_plate": [
+        [
+            AcquisitionInputModel(
+                path="/path/to/plate1", plate_name="plate1", acquisition_id=1
+            ),
+            AcquisitionInputModel(
+                path="/path/to/plate2", plate_name="plate2", acquisition_id=2
+            ),
+        ],
+        [
+            AcquisitionInputModel(path="/path/to/plate1", plate_name="plate1"),
+            AcquisitionInputModel(path="/path/to/plate2", plate_name="plate2"),
+        ],
+    ],
+    "single_plate": [
+        [
+            AcquisitionInputModel(
+                path="/path/to/plate1", plate_name="plate1", acquisition_id=1
+            ),
+        ]
+    ],
+    "invalid": [
+        [
+            AcquisitionInputModel(
+                path="/path/to/plate1", plate_name="plate1", acquisition_id=1
+            ),
+            AcquisitionInputModel(
+                path="/path/to/plate2", plate_name="plate1", acquisition_id=1
+            ),
+        ],
+        [],
+        [
+            AcquisitionInputModel(path="/path/to/plate1", plate_name="plate1"),
+            AcquisitionInputModel(path="/path/to/plate2", plate_name="plate1"),
+        ],
+    ],
+}
+
+
+def test_plate_name_acquisition_constraints():
+    for multiplexing_acq in acquisitions["multiplexing"]:
+        assert check_is_multiplexing(multiplexing_acq) is True
+    for multi_plate_acq in acquisitions["multi_plate"]:
+        print(multi_plate_acq)
+        assert check_is_multiplexing(multi_plate_acq) is False
+    for single_plate_acq in acquisitions["single_plate"]:
+        assert check_is_multiplexing(single_plate_acq) is False
+    for invalid_acq in acquisitions["invalid"]:
+        with pytest.raises(ValueError):
+            check_is_multiplexing(invalid_acq)
