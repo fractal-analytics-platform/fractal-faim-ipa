@@ -30,7 +30,7 @@
               "plate_name": {
                 "title": "Plate Name",
                 "type": "string",
-                "description": "Optional custom name for the plate. If not provided, the name will be the acquisition directory name."
+                "description": "Optional custom name for the plate. If not provided, the name will be the acquisition directory name. For multiplexing, all plates need to be set to have the same plate name. For non-multiplexing (e.g. processing a series of plate), all plates need to have unique names."
               },
               "acquisition_id": {
                 "default": 0,
@@ -168,7 +168,7 @@
               "plate_name": {
                 "title": "Plate Name",
                 "type": "string",
-                "description": "Optional custom name for the plate. If not provided, the name will be the acquisition directory name."
+                "description": "Optional custom name for the plate. If not provided, the name will be the acquisition directory name. For multiplexing, all plates need to be set to have the same plate name. For non-multiplexing (e.g. processing a series of plate), all plates need to have unique names."
               },
               "acquisition_id": {
                 "default": 0,
