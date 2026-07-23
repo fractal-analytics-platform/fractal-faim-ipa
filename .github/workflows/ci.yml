@@ -27,7 +27,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        # Pinned to 3.11: newer Python versions pull in pydantic-zarr>=0.10,
+        # which is broken with the pydantic version fractal-tasks-core pins.
+        python-version: ["3.11"]
         platform: [ubuntu-latest, macos-latest]
 
     steps:
