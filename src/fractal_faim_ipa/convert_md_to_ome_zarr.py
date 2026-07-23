@@ -1,5 +1,6 @@
 # OME-Zarr creation from MD Image Express
 import logging
+import os
 import shutil
 from os.path import exists, join
 from typing import Any, Literal
@@ -131,13 +132,17 @@ def convert_md_to_ome_zarr(  # noqa: C901
 
     # The automatic distribute.Client option often fails to finish when
     # running the task locally. Set parallelize to false to avoid that.
+    # Use FRACTAL_CACHE_DIR for dask's worker scratch space when set, since
+    # dask otherwise defaults to /tmp, which may not have enough space.
+    dask_local_directory = os.environ.get("FRACTAL_CACHE_DIR")
     if parallelize:
-        client = distributed.Client()
+        client = distributed.Client(local_directory=dask_local_directory)
     else:
         client = distributed.Client(
             n_workers=1,
             threads_per_worker=1,
             processes=False,
+            local_directory=dask_local_directory,
         )
 
     for acquisition in acquisitions:
